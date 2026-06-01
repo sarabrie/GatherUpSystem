@@ -8,5 +8,9 @@ namespace GatherUp.Core.DO.Finance
 {
     internal class VendorAllocation
     {
+        public string Name { get; set; }
+        public decimal AmountOwed { get; set; }
+        public bool HasReciept { get; set; }
+        List<ReceiptDetails> Receipts { get; set; } = new List<ReceiptDetails>();
     }
 }
