@@ -24,11 +24,11 @@ namespace GatherUp.Infrastructure.Data
                 IRepository<Event> eventRepo)
             {
                 // 1. איתחול מנהל אירוע
-                var manager = new EventManager { Name = "שירה לוי", Email = "shira.manager@gmail.com" };
+                var manager = new EventManager { Name = "אילה לוי", Email = "ayala99263@gmail.com" };
                 managerRepo.Add(manager);
 
                 // 2. איתחול מארח/בעל אירוע
-                var host = new EventHost { Name = "משה כהן", Email = "moshe.host@gmail.com" };
+                var host = new EventHost { Name = "שרה ברייש", Email = "moshe.host@gmail.com" };
                 hostRepo.Add(host);
 
                 // 3. איתחול משתתפים (אחד שילם, אחד עוד לא השיב)

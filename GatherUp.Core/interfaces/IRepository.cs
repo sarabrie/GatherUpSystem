@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace GatherUp.Core.Interfaces
 {
 
-    
+  
         public interface IRepository<T> where T : class, IEntity
         {
             void Add(T entity);
