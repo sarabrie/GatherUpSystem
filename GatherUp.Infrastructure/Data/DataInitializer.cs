@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GatherUp.Core.Interfaces; // I גדולה!
+using GatherUp.Core.Interfaces; 
 using GatherUp.Core.DO;
 using GatherUp.Core.DO.Users;
 using GatherUp.Core.DO.Finance;
@@ -8,13 +8,11 @@ using GatherUp.Core.DO.Polls;
 
 namespace GatherUp.Infrastructure.Data
 {
-    // ... כל שאר קוד ה-Initialize ששלחת נשאר בדיוק אותו דבר!
 
     namespace GatherUp.Infrastructure.Data
     {
         public static class DataInitializer
         {
-            // פונקציית האיתחול המרכזית שמקבלת את האינטרפייסים של ה-Repositories ומאכלסת אותם
             public static void Initialize(
                 IRepository<EventManager> managerRepo,
                 IRepository<EventHost> hostRepo,
@@ -23,15 +21,12 @@ namespace GatherUp.Infrastructure.Data
                 IRepository<Poll> pollRepo,
                 IRepository<Event> eventRepo)
             {
-                // 1. איתחול מנהל אירוע
                 var manager = new EventManager { Name = "אילה לוי", Email = "ayala99263@gmail.com" };
                 managerRepo.Add(manager);
 
-                // 2. איתחול מארח/בעל אירוע
                 var host = new EventHost { Name = "שרה ברייש", Email = "moshe.host@gmail.com" };
                 hostRepo.Add(host);
 
-                // 3. איתחול משתתפים (אחד שילם, אחד עוד לא השיב)
                 var participant1 = new Participant
                 {
                     Name = "ישראל ישראלי",
@@ -47,26 +42,23 @@ namespace GatherUp.Infrastructure.Data
                 {
                     Name = "רחל אברהם",
                     Email = "rachel.test@gmail.com",
-                    IsAttending = null, // טרם השיבה
+                    IsAttending = null, 
                     HasPaid = false,
                     AmountContributed = 0m
                 };
                 participant2.MailingPreferences.Add(MailingPreference.Sms);
                 participantRepo.Add(participant2);
 
-                // 4. איתחול ספק עם חוב וקבלה
                 var vendor = new VendorAllocation
                 {
                     Name = "קייטרינג אסאדו הגורמה",
-                    AmountOwed = 15000.00m, // חוב לספק
+                    AmountOwed = 15000.00m,
                     HasReceipt = true
                 };
-                // הוספת קבלה לרשומה הקפואה (record)
                 vendor.Receipts.Add(new ReceiptDetails("REC-10024", 5000.00m, DateTime.Now.AddDays(-5)));
                 vendorRepo.Add(vendor);
 
-                // 5. איתחול שאלונים וסקרים
-                // סקר א': פרטים התחלתיים
+
                 var initialPoll = new Poll { Title = "פרטים התחלתיים", Description = "הצבעה על תאריך ומיקום מועדף לאירוע" };
                 var q1 = new PollQuestion { QuestionText = "איזה מיקום מועדף עליך?" };
                 q1.Options.AddRange(new[] { "תל אביב", "ירושלים", "חיפה" });
@@ -76,24 +68,21 @@ namespace GatherUp.Infrastructure.Data
                 initialPoll.Questions.Add(q2);
                 pollRepo.Add(initialPoll);
 
-                // סקר ב': סקר המשך
                 var followupPoll = new Poll { Title = "סקר המשך - קולינריה", Description = "בחירת מנות מועדפות" };
                 var q3 = new PollQuestion { QuestionText = "איזו מנה עיקרית תעדיף?" };
                 q3.Options.AddRange(new[] { "בשרי", "צמחוני", "טבעוני" });
                 followupPoll.Questions.Add(q3);
                 pollRepo.Add(followupPoll);
 
-                // 6. איתחול האירוע המרכזי וקישור כל ה-IDs שנוצרו אוטומטית ברפוזיטוריז
                 var mainEvent = new Event
                 {
                     Title = "אירוע חברה שנתי GatherUp",
                     EventDate = DateTime.Now.AddMonths(2),
                     Location = "אולם גני האירועים",
-                    EventManagerId = manager.Id, // מקבל את ה-Id שנוצר ב-managerRepo.Add
-                    EventHostId = host.Id       // מקבל את ה-Id שנוצר ב-hostRepo.Add
+                    EventManagerId = manager.Id,
+                    EventHostId = host.Id       
                 };
 
-                // קישור רשימות המזהים
                 mainEvent.ParticipantIds.Add(participant1.Id);
                 mainEvent.ParticipantIds.Add(participant2.Id);
                 mainEvent.VendorIds.Add(vendor.Id);

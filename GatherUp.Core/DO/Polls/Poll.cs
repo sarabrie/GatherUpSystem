@@ -11,6 +11,6 @@ namespace GatherUp.Core.DO.Polls
         public int Id {  get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public List <PollQuestion> Questions {  get; set; }
+        public List<PollQuestion> Questions { get; set; } = new List<PollQuestion>();
     }
 }
