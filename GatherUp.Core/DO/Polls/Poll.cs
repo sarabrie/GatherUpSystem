@@ -8,5 +8,9 @@ namespace GatherUp.Core.DO.Polls
 {
     internal class Poll
     {
+        public int id {  get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        List <PollQuestion> Questions {  get; set; }
     }
 }
