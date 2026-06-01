@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using GatherUp.Core.Interfaces;
 namespace GatherUp.Core.DO.Users
 {
-    internal class Person
+    public class Person:IEntity
     {
         public int Id { get; set; }
         public required string Name { get; init; }

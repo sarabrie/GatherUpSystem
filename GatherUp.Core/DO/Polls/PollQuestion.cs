@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GatherUp.Core.DO.Polls
 {
-    internal class PollQuestion
+    public class PollQuestion
     {
         public int QuestionId {  get; set; }
         public string QuestionText { get; set; }

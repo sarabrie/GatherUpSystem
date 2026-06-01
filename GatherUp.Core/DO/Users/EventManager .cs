@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GatherUp.Core.DO.Users
 {
-    internal class EventManager : Person
+    public class EventManager : Person
     {
     }
 }

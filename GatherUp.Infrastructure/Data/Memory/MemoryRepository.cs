@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GatherUp.Core.interfaces;
+using GatherUp.Core.Interfaces;
 
 namespace GatherUp.Infrastructure.Data.Memory
 {
-    // המחלקה גנרית <T> ומחויבת לאותם אילוצים של ה-Interface: חייבת להיות מחלקה שמממשת את IEntity
     public class MemoryRepository<T> : IRepository<T> where T : class, IEntity
     {
         private readonly List<T> _data = new List<T>();

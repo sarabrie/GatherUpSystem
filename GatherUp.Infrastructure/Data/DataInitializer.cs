@@ -1,0 +1,107 @@
+﻿using System;
+using System.Collections.Generic;
+using GatherUp.Core.Interfaces; // I גדולה!
+using GatherUp.Core.DO;
+using GatherUp.Core.DO.Users;
+using GatherUp.Core.DO.Finance;
+using GatherUp.Core.DO.Polls;
+
+namespace GatherUp.Infrastructure.Data
+{
+    // ... כל שאר קוד ה-Initialize ששלחת נשאר בדיוק אותו דבר!
+
+    namespace GatherUp.Infrastructure.Data
+    {
+        public static class DataInitializer
+        {
+            // פונקציית האיתחול המרכזית שמקבלת את האינטרפייסים של ה-Repositories ומאכלסת אותם
+            public static void Initialize(
+                IRepository<EventManager> managerRepo,
+                IRepository<EventHost> hostRepo,
+                IRepository<Participant> participantRepo,
+                IRepository<VendorAllocation> vendorRepo,
+                IRepository<Poll> pollRepo,
+                IRepository<Event> eventRepo)
+            {
+                // 1. איתחול מנהל אירוע
+                var manager = new EventManager { Name = "שירה לוי", Email = "shira.manager@gmail.com" };
+                managerRepo.Add(manager);
+
+                // 2. איתחול מארח/בעל אירוע
+                var host = new EventHost { Name = "משה כהן", Email = "moshe.host@gmail.com" };
+                hostRepo.Add(host);
+
+                // 3. איתחול משתתפים (אחד שילם, אחד עוד לא השיב)
+                var participant1 = new Participant
+                {
+                    Name = "ישראל ישראלי",
+                    Email = "israel.test@gmail.com",
+                    IsAttending = true,
+                    HasPaid = true,
+                    AmountContributed = 250.00m
+                };
+                participant1.MailingPreferences.Add(MailingPreference.Email);
+                participantRepo.Add(participant1);
+
+                var participant2 = new Participant
+                {
+                    Name = "רחל אברהם",
+                    Email = "rachel.test@gmail.com",
+                    IsAttending = null, // טרם השיבה
+                    HasPaid = false,
+                    AmountContributed = 0m
+                };
+                participant2.MailingPreferences.Add(MailingPreference.Sms);
+                participantRepo.Add(participant2);
+
+                // 4. איתחול ספק עם חוב וקבלה
+                var vendor = new VendorAllocation
+                {
+                    Name = "קייטרינג אסאדו הגורמה",
+                    AmountOwed = 15000.00m, // חוב לספק
+                    HasReceipt = true
+                };
+                // הוספת קבלה לרשומה הקפואה (record)
+                vendor.Receipts.Add(new ReceiptDetails("REC-10024", 5000.00m, DateTime.Now.AddDays(-5)));
+                vendorRepo.Add(vendor);
+
+                // 5. איתחול שאלונים וסקרים
+                // סקר א': פרטים התחלתיים
+                var initialPoll = new Poll { Title = "פרטים התחלתיים", Description = "הצבעה על תאריך ומיקום מועדף לאירוע" };
+                var q1 = new PollQuestion { QuestionText = "איזה מיקום מועדף עליך?" };
+                q1.Options.AddRange(new[] { "תל אביב", "ירושלים", "חיפה" });
+                var q2 = new PollQuestion { QuestionText = "איזה חודש הכי נוח לך?" };
+                q2.Options.AddRange(new[] { "יוני", "יולי", "אוגוסט" });
+                initialPoll.Questions.Add(q1);
+                initialPoll.Questions.Add(q2);
+                pollRepo.Add(initialPoll);
+
+                // סקר ב': סקר המשך
+                var followupPoll = new Poll { Title = "סקר המשך - קולינריה", Description = "בחירת מנות מועדפות" };
+                var q3 = new PollQuestion { QuestionText = "איזו מנה עיקרית תעדיף?" };
+                q3.Options.AddRange(new[] { "בשרי", "צמחוני", "טבעוני" });
+                followupPoll.Questions.Add(q3);
+                pollRepo.Add(followupPoll);
+
+                // 6. איתחול האירוע המרכזי וקישור כל ה-IDs שנוצרו אוטומטית ברפוזיטוריז
+                var mainEvent = new Event
+                {
+                    Title = "אירוע חברה שנתי GatherUp",
+                    EventDate = DateTime.Now.AddMonths(2),
+                    Location = "אולם גני האירועים",
+                    EventManagerId = manager.Id, // מקבל את ה-Id שנוצר ב-managerRepo.Add
+                    EventHostId = host.Id       // מקבל את ה-Id שנוצר ב-hostRepo.Add
+                };
+
+                // קישור רשימות המזהים
+                mainEvent.ParticipantIds.Add(participant1.Id);
+                mainEvent.ParticipantIds.Add(participant2.Id);
+                mainEvent.VendorIds.Add(vendor.Id);
+                mainEvent.PollIds.Add(initialPoll.Id);
+                mainEvent.PollIds.Add(followupPoll.Id);
+
+                eventRepo.Add(mainEvent);
+            }
+        }
+    }
+}

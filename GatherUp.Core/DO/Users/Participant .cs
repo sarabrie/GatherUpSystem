@@ -12,7 +12,7 @@ namespace GatherUp.Core.DO.Users
         Sms,
         None
     }
-    internal class Participant : Person
+    public class Participant : Person
     {
         public bool? IsAttending { get; set; }
         public bool HasPaid { get; set; }
