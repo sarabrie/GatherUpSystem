@@ -14,9 +14,9 @@ namespace GatherUp.Core.DO.Users
     }
     public class Participant : Person
     {
-        public bool? IsAttending { get; set; }
-        public bool HasPaid { get; set; }
-        public decimal AmountContributed { get; set; }
+        public bool? IsAttending { get; set; } = false;
+        public bool HasPaid { get; set; }=false;
+        public decimal AmountContributed { get; set; }=Decimal.Zero;
         public List<MailingPreference> MailingPreferences { get; set; } = new List<MailingPreference>();
     }
 }
