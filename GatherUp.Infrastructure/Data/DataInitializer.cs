@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using GatherUp.Core.Interfaces; 
+using GatherUp.Core.Interfaces;
 using GatherUp.Core.DO;
 using GatherUp.Core.DO.Users;
 using GatherUp.Core.DO.Finance;
 using GatherUp.Core.DO.Polls;
 
-namespace GatherUp.Infrastructure.Data
-{
+
 
     namespace GatherUp.Infrastructure.Data
     {
@@ -42,7 +41,7 @@ namespace GatherUp.Infrastructure.Data
                 {
                     Name = "רחל אברהם",
                     Email = "rachel.test@gmail.com",
-                    IsAttending = null, 
+                    IsAttending = null,
                     HasPaid = false,
                     AmountContributed = 0m
                 };
@@ -55,7 +54,7 @@ namespace GatherUp.Infrastructure.Data
                     AmountOwed = 15000.00m,
                     HasReceipt = true
                 };
-                vendor.Receipts.Add(new ReceiptDetails("REC-10024", 5000.00m, DateTime.Now.AddDays(-5)));
+                vendor.Receipts.Add(new ReceiptDetails { ReceiptNumber="12344", Amount = 15000.00m, Date = DateTime.Now.AddDays(-10)});
                 vendorRepo.Add(vendor);
 
 
@@ -80,7 +79,7 @@ namespace GatherUp.Infrastructure.Data
                     EventDate = DateTime.Now.AddMonths(2),
                     Location = "אולם גני האירועים",
                     EventManagerId = manager.Id,
-                    EventHostId = host.Id       
+                    EventHostId = host.Id
                 };
 
                 mainEvent.ParticipantIds.Add(participant1.Id);
@@ -93,4 +92,3 @@ namespace GatherUp.Infrastructure.Data
             }
         }
     }
-}

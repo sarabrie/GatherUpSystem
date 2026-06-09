@@ -1,37 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GatherUp.Core.Interfaces;
+using GatherUp.Infrastructure.XML; 
 
 namespace GatherUp.Infrastructure.Data
 {
-    public class XmlRepository<T> : IRepository<T> where T : class,IEntity, new()
+    public class XmlRepository<T> : IRepository<T> where T : class, IEntity, new()
     {
+        protected readonly string _filePath;
 
-        public T GetById(int id)
+        
+        public XmlRepository()
         {
-            throw new NotImplementedException();
+            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XmlDatabase");
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            string fileName = $"{typeof(T).Name}.xml";
+            _filePath = Path.Combine(folderPath, fileName);
         }
 
         public IEnumerable<T> GetAll()
         {
-            throw new NotImplementedException();
+            if (!File.Exists(_filePath))
+            {
+                return new List<T>();
+            }
+
+            return XMLSerializer.ReadFromFile<List<T>>(_filePath) ?? new List<T>();
         }
 
-        public void Add(T entity)
+        public virtual T GetById(int id)
         {
-            throw new NotImplementedException();
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
-        public void Update(T entity)
+        public virtual void Add(T entity)
         {
-            throw new NotImplementedException();
+            List<T> currentData = GetAll().ToList();
+
+            currentData.Add(entity);
+
+            XMLSerializer.WriteToFile(_filePath, currentData);
         }
-        public void Delete(int id)
+
+        public virtual void Update(T entity)
         {
-            throw new NotImplementedException();
+            List<T> currentData = GetAll().ToList();
+
+            int index = currentData.FindIndex(x => x.Id == entity.Id);
+
+            if (index != -1)
+            {
+                currentData[index] = entity;
+
+                XMLSerializer.WriteToFile(_filePath, currentData);
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Entity with ID {entity.Id} not found.");
+            }
+             
+        }
+
+       
+        public virtual void Delete(int id)
+        {
+            List<T> currentData = GetAll().ToList();
+
+            T entityToDelete = currentData.FirstOrDefault(x => x.Id == id);
+
+            if (entityToDelete != null)
+            {
+                currentData.Remove(entityToDelete);
+
+                XMLSerializer.WriteToFile(_filePath, currentData);
+            }
         }
     }
 }

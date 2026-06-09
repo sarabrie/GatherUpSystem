@@ -9,7 +9,7 @@ namespace GatherUp.Infrastructure.XML
 {
     public class XMLSerializer
     {
-        public void WriteToFile<T>(string filePath, T data) where T : class, new()
+        public  static void WriteToFile<T>(string filePath, T data) where T : class, new()
         {
             if (string.IsNullOrEmpty(filePath))
                 throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));

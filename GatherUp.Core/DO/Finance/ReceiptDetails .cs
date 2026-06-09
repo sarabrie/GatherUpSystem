@@ -1,10 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GatherUp.Core.Interfaces;
 
 namespace GatherUp.Core.DO.Finance
 {
-    public record ReceiptDetails(string ReceiptNumber, decimal Amount, DateTime Date);
+    public class ReceiptDetails : IEntity
+    {
+        public int Id { get; set; }
+        public string ReceiptNumber { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
+    }
 }
+//בגלל שאין סרילזציה בניהול הקובץ אין כאן אנוטציות

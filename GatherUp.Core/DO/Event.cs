@@ -12,7 +12,7 @@ namespace GatherUp.Core.DO
         [XmlAttribute]
         public int Id { get; set; }
         [XmlElement]
-        public required string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         [XmlElement]
         public DateTime EventDate { get; set; } 
         [XmlElement]
