@@ -2,64 +2,52 @@
 using System.Collections.Generic;
 using System.Linq;
 using GatherUp.Core.Interfaces;
-using GatherUp.Core.DO.Finance;
-using GatherUp.Core.DO.Users;
 using GatherUp.Core.DO;
+using GatherUp.Core.DO.Users;
+using GatherUp.Core.DO.Finance;
 
 namespace GatherUp.BL.Services
 {
     public class FinanceService
     {
-        private readonly IRepository<VendorAllocation> _vendorRepo;
-        private readonly IRepository<ReceiptDetails> _receiptRepo;
-        private readonly IRepository<Participant> _participantRepo;
         private readonly IRepository<Event> _eventRepo;
+        private readonly IRepository<Participant> _participantRepo;
+        private readonly IRepository<VendorAllocation> _vendorAllocationRepo;
 
         public FinanceService(
-            IRepository<VendorAllocation> vendorRepo,
-            IRepository<ReceiptDetails> receiptRepo,
+            IRepository<Event> eventRepo,
             IRepository<Participant> participantRepo,
-            IRepository<Event> eventRepo)
+            IRepository<VendorAllocation> vendorAllocationRepo)
         {
-            _vendorRepo = vendorRepo;
-            _receiptRepo = receiptRepo;
-            _participantRepo = participantRepo;
             _eventRepo = eventRepo;
+            _participantRepo = participantRepo;
+            _vendorAllocationRepo = vendorAllocationRepo;
         }
 
         public IEnumerable<VendorAllocation> GetEventSuppliersAndReceipts(int eventId)
         {
             Event ev = _eventRepo.GetById(eventId);
-
             if (ev == null || ev.VendorIds == null)
                 return Enumerable.Empty<VendorAllocation>();
 
-            IEnumerable<VendorAllocation> allVendors = _vendorRepo.GetAll();
-
-            return allVendors.Where(v => ev.VendorIds.Contains(v.Id));
+            return _vendorAllocationRepo.GetAll().Where(v => ev.VendorIds.Contains(v.Id));
         }
 
-        public decimal GetTotalEstimatedExpenses()
+        public decimal CalculateEventFinancialStatus(int eventId)
         {
-            return _vendorRepo.GetAll()
-                .Sum(v => v.AmountOwed);
+            return _participantRepo.GetAll()
+            .Where(p => p.IsAttending == true && p.HasPaid == true)
+            .Sum(p => p.AmountContributed)
+            - GetEventSuppliersAndReceipts(eventId).Sum(v => v.AmountOwed);
         }
 
-        public decimal GetTotalActualExpenses()
+        public IEnumerable<object> GetFlattenedReceiptsReport(int eventId)
         {
-            return _receiptRepo.GetAll()
-                .Sum(r => r.Amount);
-        }
-
-        public decimal GetEventBalance()
-        {
-            decimal totalIncome = _participantRepo.GetAll()
-                .Where(p => p.HasPaid)
-                .Sum(p => p.AmountContributed);
-
-            decimal totalExpenses = GetTotalActualExpenses();
-
-            return totalIncome - totalExpenses;
+            return GetEventSuppliersAndReceipts(eventId)
+                .SelectMany(vendor => vendor.Receipts)                          
+                .OrderByDescending(receipt => receipt.Date)  
+                .Select(receipt => new { receipt.ReceiptNumber, receipt.Amount }) 
+                .ToList();
         }
     }
 }

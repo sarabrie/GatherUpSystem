@@ -2,24 +2,45 @@
 using System.Collections.Generic;
 using System.Linq;
 using GatherUp.Core.Interfaces;
-using GatherUp.Core.DO.Users; 
-using GatherUp.Core.DO;  
+using GatherUp.Core.DO;
+using GatherUp.Core.DO.Users;
+using GatherUp.Core.DO.Polls;
 
 namespace GatherUp.BL.Services
 {
     public class EventManagerService
     {
-        private readonly IRepository<Participant> _participantRepo;
         private readonly IRepository<Event> _eventRepo;
+        private readonly IRepository<Participant> _participantRepo;
+        private readonly IMailService _mailService;
 
-        public EventManagerService(IRepository<Participant> participantRepo, IRepository<Event> eventRepo)
+        public EventManagerService(
+            IRepository<Event> eventRepo,
+            IRepository<Participant> participantRepo,
+            IMailNotificationBridge notificationBridge, 
+            IMailService mailService)
         {
-            _participantRepo = participantRepo;
             _eventRepo = eventRepo;
+            _participantRepo = participantRepo;
+            _mailService = mailService;
+
+            notificationBridge.OnParticipantAction += HandleParticipantAction;
+            notificationBridge.OnEventAction += HandleEventAction;
+        }
+
+        public IEnumerable<Participant> GetParticipantsForEvent(int eventId)
+        {
+            Event ev = _eventRepo.GetById(eventId);
+            if (ev == null || ev.ParticipantIds == null)
+                return Enumerable.Empty<Participant>();
+
+            return _participantRepo.GetAll().Where(p => ev.ParticipantIds.Contains(p.Id));
         }
 
         public void AddParticipantToEvent(int eventId, Participant participant)
         {
+            if (participant == null) return;
+
             _participantRepo.Add(participant);
 
             Event ev = _eventRepo.GetById(eventId);
@@ -33,23 +54,43 @@ namespace GatherUp.BL.Services
             }
         }
 
-        public IEnumerable<Participant> GetAttendingParticipants()
+        public void UpdateEventDetails(int eventId, Event updatedEvent)
         {
-            return _participantRepo.GetAll()
-                .Where(p => p.IsAttending == true);
+            if (updatedEvent == null) return;
+
+            Event existingEvent = _eventRepo.GetById(eventId);
+            if (existingEvent != null)
+            {
+                existingEvent.Title = updatedEvent.Title;
+                existingEvent.EventDate = updatedEvent.EventDate;
+                existingEvent.Location = updatedEvent.Location;
+
+                _eventRepo.Update(existingEvent);
+            }
         }
 
-        public IEnumerable<Participant> GetUndecidedParticipants()
+        public void SendReminderToParticipants(int eventId, string reminderType)
         {
-            return _participantRepo.GetAll()
-                .Where(p => p.IsAttending == null);
+            GetParticipantsForEvent(eventId)
+                .Where(p => !string.IsNullOrEmpty(p.Email))
+                .ToList()
+                .ForEach(p => _mailService.Send(p.Email, $"Reminder: {reminderType}", "Please take action regarding the event."));
         }
 
-        public decimal GetTotalAmountCollected()
+        private void HandleParticipantAction(int eventId, string actionType)
         {
-            return _participantRepo.GetAll()
-                .Where(p => p.HasPaid)
-                .Sum(p => p.AmountContributed);
+            _participantRepo.GetAll()
+                .Where(p => !string.IsNullOrEmpty(p.Email))
+                .ToList()
+                .ForEach(p => _mailService.Send(p.Email, $"עדכון מנהל: {actionType}", $"בוצעה פעולה באירוע {eventId}: {actionType}"));
+        }
+
+        private void HandleEventAction(int eventId, string actionType)
+        {
+            _participantRepo.GetAll()
+                .Where(p => !string.IsNullOrEmpty(p.Email))
+                .ToList()
+                .ForEach(p => _mailService.Send(p.Email, $"עדכון אירוע: {actionType}", $"חל שינוי באירוע {eventId}: {actionType}"));
         }
     }
 }

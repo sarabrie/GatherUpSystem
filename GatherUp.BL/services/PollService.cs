@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using GatherUp.Core.Interfaces;
-using GatherUp.Core.DO.Polls;
 using GatherUp.Core.DO;
+using GatherUp.Core.DO.Polls;
 
 namespace GatherUp.BL.Services
 {
     public class PollService
     {
-        private readonly IRepository<Poll> _pollRepo;
         private readonly IRepository<Event> _eventRepo;
+        private readonly IRepository<Poll> _pollRepo;
 
-        public PollService(IRepository<Poll> pollRepo, IRepository<Event> eventRepo)
+        public PollService(IRepository<Event> eventRepo, IRepository<Poll> pollRepo)
         {
-            _pollRepo = pollRepo;
             _eventRepo = eventRepo;
+            _pollRepo = pollRepo;
         }
 
         public IEnumerable<Poll> GetEventPolls(int eventId)
@@ -24,43 +24,42 @@ namespace GatherUp.BL.Services
             if (ev == null || ev.PollIds == null)
                 return Enumerable.Empty<Poll>();
 
-            IEnumerable<Poll> allPolls = _pollRepo.GetAll();
-            return allPolls.Where(p => ev.PollIds.Contains(p.Id));
-        }
-         public Poll GetPollById(int pollId)
-        {
-            return _pollRepo.GetById(pollId);
+            return _pollRepo.GetAll().Where(p => ev.PollIds.Contains(p.Id));
         }
 
-        public IEnumerable<PollQuestion> GetAllQuestionsFromAllPolls()
+        public bool IsPollValidAndActive(int pollId)
         {
-            return _pollRepo.GetAll()
-                .SelectMany(poll => poll.Questions);
+            Poll poll = _pollRepo.GetAll().FirstOrDefault(p => p.Id == pollId);
+
+            return poll != null && poll.Questions != null && poll.Questions.Any();
         }
 
-        public string GetMostVotedOption(int pollId, int questionId)
+        public Dictionary<string, double> CalculateQuestionResultsPercentages(int pollId, int questionId)
         {
-            var poll = _pollRepo.GetById(pollId);
-            if (poll == null) return "הסקר לא נמצא";
+            Poll poll = _pollRepo.GetAll().FirstOrDefault(p => p.Id == pollId);
+            if (poll == null || poll.Questions == null)
+                return new Dictionary<string, double>();
 
             var question = poll.Questions.FirstOrDefault(q => q.QuestionId == questionId);
-            if (question == null || question.ParticipantVotes == null || !question.ParticipantVotes.Any())
-            {
-                return "אין עדיין הצבעות לשאלה זו";
-            }
 
-            var mostVotedOptionIndex = question.ParticipantVotes
-                .GroupBy(vote => vote.Value)
-                .OrderByDescending(group => group.Count())
-                .First()
-                .Key;
+            if (question == null || question.Options == null || !question.Options.Any())
+                return new Dictionary<string, double>();
 
-            if (mostVotedOptionIndex >= 0 && mostVotedOptionIndex < question.Options.Count)
-            {
-                return question.Options[mostVotedOptionIndex];
-            }
+            int totalVotes = question.ParticipantVotesXml != null ? question.ParticipantVotesXml.Length : 0;
 
-            return "נמצאה הצבעה לאופציה לא תקינה";
+            if (totalVotes == 0)
+                return question.Options.ToDictionary(optionText => optionText, percentage => 0.0);
+
+            return question.Options
+                .Select((optionText, index) => new
+                {
+                    Text = optionText,
+                    VoteCount = question.ParticipantVotesXml.Count(v => v.ChosenOptionIndex == index)
+                })
+                .ToDictionary(
+                    x => x.Text,
+                    x => Math.Round((double)x.VoteCount / totalVotes * 100, 2) 
+                );
         }
     }
 }

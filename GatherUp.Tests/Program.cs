@@ -5,6 +5,8 @@ using GatherUp.Core.DO;
 using GatherUp.Core.DO.Users;
 using GatherUp.Core.DO.Finance;
 using GatherUp.Core.DO.Polls;
+using GatherUp.BL.Services;
+
 using GatherUp.Infrastructure.Data.Memory;
 using GatherUp.Infrastructure.Data; // ודאי שזה ה-Namespace שבו נמצא ה-XmlRepository וה-ReceiptRepository שלך
 namespace GatherUp.Tests
@@ -24,6 +26,7 @@ namespace GatherUp.Tests
             IRepository<VendorAllocation> memVendorRepo = new MemoryRepository<VendorAllocation>();
             IRepository<Poll> memPollRepo = new MemoryRepository<Poll>();
             IRepository<Event> memEventRepo = new MemoryRepository<Event>();
+            // רישום שירות שליחת המיילים לקובץ
 
             Console.WriteLine("[מערכת]: מריץ איתחול נתונים לזיכרון (Memory)...");
             DataInitializer.Initialize(memManagerRepo, memHostRepo, memParticipantRepo, memVendorRepo, memPollRepo, memEventRepo);
