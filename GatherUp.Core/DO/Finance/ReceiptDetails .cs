@@ -10,7 +10,7 @@ namespace GatherUp.Core.DO.Finance
         public ReceiptDetails()
         {
         }
-        public int Id { get; init; }
+        public int Id { get; set; }
         public required string ReceiptNumber { get; set; } = string.Empty;
         public required decimal Amount { get; set; }
         public required string ReceiptFilePath { get; set; } = string.Empty;

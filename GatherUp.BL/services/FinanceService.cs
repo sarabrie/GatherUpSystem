@@ -13,15 +13,18 @@ namespace GatherUp.BL.Services
         private readonly IRepository<Event> _eventRepo;
         private readonly IRepository<Participant> _participantRepo;
         private readonly IRepository<VendorAllocation> _vendorAllocationRepo;
+        private readonly IRepository<ReceiptDetails> _receiptRepo;
 
         public FinanceService(
             IRepository<Event> eventRepo,
             IRepository<Participant> participantRepo,
-            IRepository<VendorAllocation> vendorAllocationRepo)
+            IRepository<VendorAllocation> vendorAllocationRepo,
+            IRepository<ReceiptDetails> receiptRepo)
         {
             _eventRepo = eventRepo;
             _participantRepo = participantRepo;
             _vendorAllocationRepo = vendorAllocationRepo;
+            _receiptRepo = receiptRepo;
         }
 
         public IEnumerable<VendorAllocation> GetEventSuppliers(int eventId)
@@ -35,8 +38,8 @@ namespace GatherUp.BL.Services
 
         public IEnumerable<ReceiptDetails> GetEventReceipts(int eventId)
         {
-            return GetEventSuppliers(eventId)
-                .SelectMany(v => v.Receipts);
+            IEnumerable<int> receiptIds = GetEventSuppliers(eventId).SelectMany(v => v.ReceiptIds);
+            return _receiptRepo.GetAll().Where(r => receiptIds.Contains(r.Id));
         }
 
         public decimal CalculateEventFinancialStatus(int eventId)
@@ -49,10 +52,9 @@ namespace GatherUp.BL.Services
 
         public IEnumerable<object> GetFlattenedReceiptsReport(int eventId)
         {
-            return GetEventSuppliers(eventId)
-                .SelectMany(vendor => vendor.Receipts)                          
-                .OrderByDescending(receipt => receipt.Date)  
-                .Select(receipt => new { receipt.ReceiptNumber, receipt.Amount, receipt.Date }) 
+            return GetEventReceipts(eventId)
+                .OrderByDescending(receipt => receipt.Date)
+                .Select(receipt => new { receipt.ReceiptNumber, receipt.Amount, receipt.Date })
                 .ToList();
         }
     }

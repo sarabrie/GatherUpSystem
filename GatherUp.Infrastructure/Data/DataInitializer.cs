@@ -5,6 +5,7 @@ using GatherUp.Core.DO;
 using GatherUp.Core.DO.Users;
 using GatherUp.Core.DO.Finance;
 using GatherUp.Core.DO.Polls;
+using GatherUp.Core.Enums;
 
 
 
@@ -54,7 +55,7 @@ using GatherUp.Core.DO.Polls;
                     AmountOwed = 15000.00m,
                     HasReceipt = true
                 };
-                vendor.Receipts.Add(new ReceiptDetails { ReceiptNumber="12344", Amount = 15000.00m, Date = DateTime.Now.AddDays(-10)});
+                vendor.ReceiptIds.Add(1);
                 vendorRepo.Add(vendor);
 
 

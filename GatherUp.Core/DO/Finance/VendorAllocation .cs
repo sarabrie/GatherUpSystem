@@ -11,7 +11,7 @@ namespace GatherUp.Core.DO.Finance
         public int Id { get; set; }
 
         [XmlElement]
-        public string Name { get; set; } = string.Empty;
+        public required string Name { get; set; } = string.Empty;
 
         [XmlElement]
         public decimal AmountOwed { get; set; } = Decimal.Zero;

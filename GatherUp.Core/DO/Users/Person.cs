@@ -12,9 +12,9 @@ namespace GatherUp.Core.DO.Users
         [XmlAttribute]
         public int Id { get; set; }
         [XmlElement]
-        public string Name { get; set; } =string.Empty;
+        public required string Name { get; set; } =string.Empty;
         [XmlElement]
-        public  string Email { get; set; } =string.Empty;
+        public required string Email { get; set; } =string.Empty;
 
     }
 }

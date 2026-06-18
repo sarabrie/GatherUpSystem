@@ -11,13 +11,13 @@ namespace GatherUp.Core.DO.Polls
     public class Poll:IEntity
     {
         [XmlAttribute]
-        public required int Id {  get; set; }
+        public int Id {  get; set; }
         [XmlElement]
         public required string Title { get; set; }= string.Empty;
         [XmlElement]
         public string Description { get; set; } = string.Empty;
         [XmlElement]
-        public required List<PollQuestion> Questions { get; set; } = new List<PollQuestion>();
+        public List<PollQuestion> Questions { get; set; } = new List<PollQuestion>();
     }
 }
 

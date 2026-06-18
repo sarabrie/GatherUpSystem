@@ -18,7 +18,7 @@ namespace GatherUp.Infrastructure.Data.Memory
 
             if (entity.Id == 0)
             {
-                entity.Id = _nextId++;
+                ((dynamic)entity).Id = _nextId++;
             }
             else
             {
