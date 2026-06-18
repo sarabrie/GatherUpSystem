@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GatherUp.Core.Interfaces
+namespace GatherUp.Core.Enums
 {
-    public interface IEntity
+    public enum MailingPreference
     {
-        int Id { get;}
+        Email,
+        Sms,
+        None
     }
-
 }

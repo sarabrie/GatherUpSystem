@@ -5,17 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using GatherUp.Core.Interfaces;
 using System.Xml.Serialization;
+using GatherUp.Core.DO.Polls;
 namespace GatherUp.Core.DO.Polls
 {
     public class Poll:IEntity
     {
         [XmlAttribute]
-        public int Id {  get; set; }
+        public required int Id {  get; set; }
         [XmlElement]
-        public string Title { get; set; }= string.Empty;
+        public required string Title { get; set; }= string.Empty;
         [XmlElement]
         public string Description { get; set; } = string.Empty;
         [XmlElement]
-        public List<PollQuestion> Questions { get; set; } = new List<PollQuestion>();
+        public required List<PollQuestion> Questions { get; set; } = new List<PollQuestion>();
     }
 }
+
+
+

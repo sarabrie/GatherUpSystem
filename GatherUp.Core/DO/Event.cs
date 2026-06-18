@@ -12,15 +12,15 @@ namespace GatherUp.Core.DO
         [XmlAttribute]
         public int Id { get; set; }
         [XmlElement]
-        public string Title { get; set; } = string.Empty;
+        public required string Title { get; set; } = string.Empty;
         [XmlElement]
         public DateTime EventDate { get; set; } 
         [XmlElement]
         public string? Location { get; set; }      
         [XmlElement]
-        public int EventManagerId { get; set; }         
+        public required int EventManagerId { get; set; }         
         [XmlElement]
-        public int EventHostId { get; set; }            
+        public required int EventHostId { get; set; }            
         [XmlElement]
         public List<int> ParticipantIds { get; set; } = new List<int>();
         [XmlElement]

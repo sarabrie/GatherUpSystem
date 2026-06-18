@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -12,7 +13,7 @@ namespace GatherUp.Infrastructure.Data
         private readonly string _receiptFilesFolder;
 
         public ReceiptRepository() : base()
-        { 
+        {
             _receiptFilesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReceiptFiles");
             if (!Directory.Exists(_receiptFilesFolder))
             {
@@ -22,10 +23,11 @@ namespace GatherUp.Infrastructure.Data
             XMLDocManager.CreateEmptyXmlFile(_filePath, "Receipts");
         }
 
-       
         public override void Add(ReceiptDetails entity)
         {
-            string originalPath = entity.ReceiptNumber;
+            if (entity == null) return;
+
+            string originalPath = entity.ReceiptFilePath;
             string fileName = Path.GetFileName(originalPath);
             string newPathInProject = Path.Combine(_receiptFilesFolder, $"{entity.Id}_{fileName}");
 
@@ -34,24 +36,22 @@ namespace GatherUp.Infrastructure.Data
                 File.Copy(originalPath, newPathInProject, overwrite: true);
             }
 
-            XElement newReceiptElement = new XElement("Receipt",
-                new XAttribute("Id", entity.Id),
-                new XElement("ReceiptNumber", newPathInProject),
-                new XElement("Amount", entity.Amount),
-                new XElement("Date", entity.Date.ToString("yyyy-MM-ddTHH:mm:ss"))
+            entity.ReceiptFilePath = newPathInProject;
+
+            XElement newReceiptElement = XMLDocManager.CreateReceiptElement(
+                entity.Id,
+                entity.ReceiptNumber,
+                entity.ReceiptFilePath,
+                entity.Amount,
+                entity.Date
             );
 
             XMLDocManager.AddElementToRoot(_filePath, newReceiptElement);
         }
 
-     
         public override ReceiptDetails GetById(int id)
         {
-            XDocument doc = XMLDocManager.LoadXmlFile(_filePath);
-
-            XElement element = doc.Root?
-                .Elements("Receipt")
-                .FirstOrDefault(x => (int?)x.Attribute("Id") == id);
+            XElement? element = XMLDocManager.GetElementById(_filePath, "Receipt", id);
 
             if (element == null)
             {
@@ -62,21 +62,25 @@ namespace GatherUp.Infrastructure.Data
             {
                 Id = (int)element.Attribute("Id"),
                 ReceiptNumber = (string)element.Element("ReceiptNumber"),
+                ReceiptFilePath = (string)element.Element("ReceiptFilePath"), // קריאת השדה החדש
                 Amount = (decimal)element.Element("Amount"),
                 Date = (DateTime)element.Element("Date")
             };
         }
 
-       
-        public override void Update(ReceiptDetails entity)
+        public override IEnumerable<ReceiptDetails> GetAll()
         {
-            throw new InvalidOperationException("Fatal error: Unable to edit or update a receipt after it was created!");
-        }
+            var elements = XMLDocManager.GetAllElements(_filePath, "Receipt");
 
-     
-        public override void Delete(int id)
-        {
-            throw new InvalidOperationException("Fatal error: A receipt cannot be deleted after it has been created!");
+            // תיקון בניית האובייקט בלולאה עבור כל הקבלות
+            return elements.Select(element => new ReceiptDetails
+            {
+                Id = (int)element.Attribute("Id"),
+                ReceiptNumber = (string)element.Element("ReceiptNumber"),
+                ReceiptFilePath = (string)element.Element("ReceiptFilePath"), // קריאת השדה החדש
+                Amount = (decimal)element.Element("Amount"),
+                Date = (DateTime)element.Element("Date")
+            }).ToList();
         }
     }
 }

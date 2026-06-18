@@ -1,14 +1,21 @@
-﻿using System;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using GatherUp.Core.Interfaces;
 
 namespace GatherUp.Core.DO.Finance
 {
     public class ReceiptDetails : IEntity
     {
-        public int Id { get; set; }
-        public string ReceiptNumber { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
+        [SetsRequiredMembers]
+        public ReceiptDetails()
+        {
+        }
+        public int Id { get; init; }
+        public required string ReceiptNumber { get; set; } = string.Empty;
+        public required decimal Amount { get; set; }
+        public required string ReceiptFilePath { get; set; } = string.Empty;
         public DateTime Date { get; set; } = DateTime.Now;
     }
+
 }
 //בגלל שאין סרילזציה בניהול הקובץ אין כאן אנוטציות

@@ -25,7 +25,7 @@ namespace GatherUp.Infrastructure.Data
             _filePath = Path.Combine(folderPath, fileName);
         }
 
-        public IEnumerable<T> GetAll()
+        public virtual IEnumerable<T> GetAll()
         {
             if (!File.Exists(_filePath))
             {

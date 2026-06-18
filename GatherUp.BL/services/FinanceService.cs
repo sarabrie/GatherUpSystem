@@ -24,7 +24,7 @@ namespace GatherUp.BL.Services
             _vendorAllocationRepo = vendorAllocationRepo;
         }
 
-        public IEnumerable<VendorAllocation> GetEventSuppliersAndReceipts(int eventId)
+        public IEnumerable<VendorAllocation> GetEventSuppliers(int eventId)
         {
             Event ev = _eventRepo.GetById(eventId);
             if (ev == null || ev.VendorIds == null)
@@ -33,20 +33,26 @@ namespace GatherUp.BL.Services
             return _vendorAllocationRepo.GetAll().Where(v => ev.VendorIds.Contains(v.Id));
         }
 
+        public IEnumerable<ReceiptDetails> GetEventReceipts(int eventId)
+        {
+            return GetEventSuppliers(eventId)
+                .SelectMany(v => v.Receipts);
+        }
+
         public decimal CalculateEventFinancialStatus(int eventId)
         {
             return _participantRepo.GetAll()
             .Where(p => p.IsAttending == true && p.HasPaid == true)
             .Sum(p => p.AmountContributed)
-            - GetEventSuppliersAndReceipts(eventId).Sum(v => v.AmountOwed);
+            - GetEventSuppliers(eventId).Sum(v => v.AmountOwed);
         }
 
         public IEnumerable<object> GetFlattenedReceiptsReport(int eventId)
         {
-            return GetEventSuppliersAndReceipts(eventId)
+            return GetEventSuppliers(eventId)
                 .SelectMany(vendor => vendor.Receipts)                          
                 .OrderByDescending(receipt => receipt.Date)  
-                .Select(receipt => new { receipt.ReceiptNumber, receipt.Amount }) 
+                .Select(receipt => new { receipt.ReceiptNumber, receipt.Amount, receipt.Date }) 
                 .ToList();
         }
     }

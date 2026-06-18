@@ -27,6 +27,18 @@ namespace GatherUp.Infrastructure.XML
             return XDocument.Load(filePath);
         }
 
+        public static XElement CreateReceiptElement(int id, string receiptNumber, string receiptFilePath , decimal amount, DateTime date)
+        {
+            return new XElement("Receipt",
+                new XAttribute("Id", id), 
+                new XElement("ReceiptNumber", receiptNumber),
+                new XElement("Amount", amount),
+                new XElement("ReceiptFilePath", receiptFilePath), // התגית החדשה שתתווסף ל-XML!
+                new XElement("Date", date.ToString("yyyy-MM-ddTHH:mm:ss"))
+            );
+        }
+
+      
         public static void AddElementToRoot(string filePath, XElement newElement)
         {
             XDocument doc = LoadXmlFile(filePath);
@@ -47,7 +59,7 @@ namespace GatherUp.Infrastructure.XML
 
             return doc.Root?
                       .Elements(elementName)
-                      .FirstOrDefault(x => (int?)x.Element("Id") == id);
+                      .FirstOrDefault(x => (int?)x.Attribute("Id") == id);
         }
 
         public static IEnumerable<XElement> GetAllElements(string filePath, string elementName)

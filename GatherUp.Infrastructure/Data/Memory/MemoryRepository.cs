@@ -16,7 +16,22 @@ namespace GatherUp.Infrastructure.Data.Memory
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity), "לא ניתן להוסיף אובייקט ריק");
 
-            entity.Id = _nextId++;
+            if (entity.Id == 0)
+            {
+                entity.Id = _nextId++;
+            }
+            else
+            {
+                if (_data.Any(x => x.Id == entity.Id))
+                {
+                    throw new InvalidOperationException($"שגיאה: אובייקט עם מזהה {entity.Id} כבר קיים במערכת!");
+                }
+
+                if (entity.Id >= _nextId)
+                {
+                    _nextId = entity.Id + 1;
+                }
+            }
 
             _data.Add(entity);
         }
