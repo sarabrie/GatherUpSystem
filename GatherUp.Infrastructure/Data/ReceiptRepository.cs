@@ -72,7 +72,6 @@ namespace GatherUp.Infrastructure.Data
         {
             var elements = XMLDocManager.GetAllElements(_filePath, "Receipt");
 
-            // תיקון בניית האובייקט בלולאה עבור כל הקבלות
             return elements.Select(element => new ReceiptDetails
             {
                 Id = (int)element.Attribute("Id"),
