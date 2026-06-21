@@ -6,6 +6,8 @@ using GatherUp.Core.DO;
 using GatherUp.Core.DO.Users;
 using GatherUp.Core.DO.Polls;
 
+using GatherUp.Core.Enums;
+
 namespace GatherUp.BL.Services
 {
     public class EventManagerService
@@ -80,7 +82,7 @@ namespace GatherUp.BL.Services
         private void HandleParticipantAction(int eventId, string actionType)
         {
             _participantRepo.GetAll()
-                .Where(p => !string.IsNullOrEmpty(p.Email))
+                .Where(p => !string.IsNullOrEmpty(p.Email) && p.MailingPreferences.Contains(MailingPreference.Email))
                 .ToList()
                 .ForEach(p => _mailService.Send(p.Email, $"עדכון מנהל: {actionType}", $"בוצעה פעולה באירוע {eventId}: {actionType}"));
         }
@@ -88,7 +90,7 @@ namespace GatherUp.BL.Services
         private void HandleEventAction(int eventId, string actionType)
         {
             _participantRepo.GetAll()
-                .Where(p => !string.IsNullOrEmpty(p.Email))
+                .Where(p => !string.IsNullOrEmpty(p.Email) && p.MailingPreferences.Contains(MailingPreference.Email))
                 .ToList()
                 .ForEach(p => _mailService.Send(p.Email, $"עדכון אירוע: {actionType}", $"חל שינוי באירוע {eventId}: {actionType}"));
         }

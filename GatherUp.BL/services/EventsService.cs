@@ -1,4 +1,5 @@
 using GatherUp.Core.DO;
+using GatherUp.Core.DO.Finance;
 using GatherUp.Core.DO.Polls;
 using GatherUp.Core.DO.Users;
 using GatherUp.Core.Interfaces;
@@ -10,38 +11,36 @@ namespace GatherUp.BL.Services
         private readonly IRepository<Event> _eventRepo;
         private readonly IRepository<Participant> _participantRepo;
         private readonly IRepository<Poll> _pollRepo;
+        private readonly IRepository<VendorAllocation> _vendorRepo;
 
         public EventsService(
             IRepository<Event> eventRepo,
             IRepository<Participant> participantRepo,
-            IRepository<Poll> pollRepo)
+            IRepository<Poll> pollRepo,
+            IRepository<VendorAllocation> vendorRepo)
         {
             _eventRepo = eventRepo;
             _participantRepo = participantRepo;
             _pollRepo = pollRepo;
+            _vendorRepo = vendorRepo;
         }
 
         public void AddEvent(Event newEvent, List<Participant> participants = null, List<Poll> polls = null)
         {
-            if (participants != null)
-            {
-                foreach (Participant participant in participants)
-                {
-                    _participantRepo.Add(participant);
-                    newEvent.ParticipantIds.Add(participant.Id);
-                }
-            }
-
-            if (polls != null)
-            {
-                foreach (Poll poll in polls)
-                {
-                    _pollRepo.Add(poll);
-                    newEvent.PollIds.Add(poll.Id);
-                }
-            }
-
+            participants?.ForEach(p => { _participantRepo.Add(p); newEvent.ParticipantIds.Add(p.Id); });
+            polls?.ForEach(p => { _pollRepo.Add(p); newEvent.PollIds.Add(p.Id); });
             _eventRepo.Add(newEvent);
+        }
+
+        public void AddVendorToEvent(int eventId, VendorAllocation vendor)
+        {
+            Event ev = _eventRepo.GetById(eventId);
+            if (ev == null)
+                throw new KeyNotFoundException($"אירוע עם מזהה {eventId} לא נמצא");
+
+            _vendorRepo.Add(vendor);
+            ev.VendorIds.Add(vendor.Id);
+            _eventRepo.Update(ev);
         }
 
         public Event GetEventDetails(int eventId)
@@ -57,21 +56,20 @@ namespace GatherUp.BL.Services
         {
             IEnumerable<Event> allEvents = _eventRepo.GetAll();
 
-            IEnumerable<Event> managedEvents = allEvents.Where(e => e.EventManagerId == userId);
-            IEnumerable<Event> hostedEvents = allEvents.Where(e => e.EventHostId == userId);
-            IEnumerable<Event> participatingEvents = allEvents.Where(e => e.ParticipantIds.Contains(userId));
-
             Console.WriteLine("אירועים שאתה מנהל:");
-            foreach (Event ev in managedEvents)
-                Console.WriteLine($"  - [{ev.Id}] {ev.Title} | {ev.EventDate:dd/MM/yyyy}");
+            allEvents.Where(e => e.EventManagerId == userId)
+                     .ToList()
+                     .ForEach(e => Console.WriteLine($"  - [{e.Id}] {e.Title} | {e.EventDate:dd/MM/yyyy}"));
 
             Console.WriteLine("אירועים שאתה בעל הבית:");
-            foreach (Event ev in hostedEvents)
-                Console.WriteLine($"  - [{ev.Id}] {ev.Title} | {ev.EventDate:dd/MM/yyyy}");
+            allEvents.Where(e => e.EventHostId == userId)
+                     .ToList()
+                     .ForEach(e => Console.WriteLine($"  - [{e.Id}] {e.Title} | {e.EventDate:dd/MM/yyyy}"));
 
             Console.WriteLine("אירועים שאתה משתתף בהם:");
-            foreach (Event ev in participatingEvents)
-                Console.WriteLine($"  - [{ev.Id}] {ev.Title} | {ev.EventDate:dd/MM/yyyy}");
+            allEvents.Where(e => e.ParticipantIds.Contains(userId))
+                     .ToList()
+                     .ForEach(e => Console.WriteLine($"  - [{e.Id}] {e.Title} | {e.EventDate:dd/MM/yyyy}"));
         }
     }
 }
