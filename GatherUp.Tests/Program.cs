@@ -85,7 +85,7 @@ namespace GatherUp.Tests
                 HasReceipt = true,
                 ReceiptIds = new List<int> { 301 }
             };
-            eventsService.AddVendorToEvent(1, vendor);
+            financeService.AddVendorToEvent(1, vendor);
             Console.WriteLine($"[✓] ספק '{vendor.Name}' נוסף לאירוע\n");
 
             string dummyInvoicePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "invoice_sample.txt");

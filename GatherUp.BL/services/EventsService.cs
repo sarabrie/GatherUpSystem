@@ -32,18 +32,7 @@ namespace GatherUp.BL.Services
             _eventRepo.Add(newEvent);
         }
 
-        public void AddVendorToEvent(int eventId, VendorAllocation vendor)
-        {
-            Event ev = _eventRepo.GetById(eventId);
-            if (ev == null)
-                throw new KeyNotFoundException($"אירוע עם מזהה {eventId} לא נמצא");
-
-            _vendorRepo.Add(vendor);
-            ev.VendorIds.Add(vendor.Id);
-            _eventRepo.Update(ev);
-        }
-
-        public Event GetEventDetails(int eventId)
+public Event GetEventDetails(int eventId)
         {
             Event ev = _eventRepo.GetById(eventId);
             if (ev == null)

@@ -66,19 +66,15 @@ namespace GatherUp.BL.Services
         }
         public void AddVendorToEvent(int eventId, VendorAllocation newVendor)
         {
-            // 1. שליפת האירוע הקיים מה-XML באמצעות ה-EventRepository
             var currentEvent = _eventRepo.GetById(eventId);
             if (currentEvent == null) return;
 
-            // 2. הוספת ה-Id של הספק לרשימת הספקים של האירוע (הגיונית)
+            _vendorAllocationRepo.Add(newVendor);
+
             if (currentEvent.VendorIds == null)
-            {
                 currentEvent.VendorIds = new List<int>();
-            }
 
             currentEvent.VendorIds.Add(newVendor.Id);
-
-            // 3. שמירה ועדכון של האירוע ב-XML
             _eventRepo.Update(currentEvent);
         }
     }
