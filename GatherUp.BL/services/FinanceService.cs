@@ -5,6 +5,7 @@ using GatherUp.Core.Interfaces;
 using GatherUp.Core.DO;
 using GatherUp.Core.DO.Users;
 using GatherUp.Core.DO.Finance;
+using System.Numerics;
 
 namespace GatherUp.BL.Services
 {
@@ -56,6 +57,29 @@ namespace GatherUp.BL.Services
                 .OrderByDescending(receipt => receipt.Date)
                 .Select(receipt => new { receipt.ReceiptNumber, receipt.Amount, receipt.Date })
                 .ToList();
+        }
+
+        public void AddReceipt(ReceiptDetails receipt)
+        {
+            if (receipt == null) return;
+            _receiptRepo.Add(receipt);
+        }
+        public void AddVendorToEvent(int eventId, VendorAllocation newVendor)
+        {
+            // 1. שליפת האירוע הקיים מה-XML באמצעות ה-EventRepository
+            var currentEvent = _eventRepo.GetById(eventId);
+            if (currentEvent == null) return;
+
+            // 2. הוספת ה-Id של הספק לרשימת הספקים של האירוע (הגיונית)
+            if (currentEvent.VendorIds == null)
+            {
+                currentEvent.VendorIds = new List<int>();
+            }
+
+            currentEvent.VendorIds.Add(newVendor.Id);
+
+            // 3. שמירה ועדכון של האירוע ב-XML
+            _eventRepo.Update(currentEvent);
         }
     }
 }

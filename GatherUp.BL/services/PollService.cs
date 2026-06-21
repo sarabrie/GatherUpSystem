@@ -61,5 +61,10 @@ namespace GatherUp.BL.Services
                     x => Math.Round((double)x.VoteCount / totalVotes * 100, 2) 
                 );
         }
+        public void CreatePoll(Poll newPoll)
+        {
+            if (newPoll == null) return;
+            _pollRepo.Add(newPoll);
+        }
     }
 }

@@ -93,4 +93,4 @@ namespace GatherUp.BL.Services
                 .ForEach(p => _mailService.Send(p.Email, $"עדכון אירוע: {actionType}", $"חל שינוי באירוע {eventId}: {actionType}"));
         }
     }
-}
+}   
