@@ -2,7 +2,7 @@
 using System.IO;
 using GatherUp.Core.Interfaces;
 
-namespace GatherUp.Infrastructure.Services
+namespace GatherUp.Infrastructure.Mail
 {
     public class FileMailService : IMailService
     {

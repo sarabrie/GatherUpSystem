@@ -2,7 +2,7 @@ using GatherUp.Core.Interfaces;
 using MailKit.Net.Smtp;
 using MimeKit;
 
-namespace GatherUp.BL.Services
+namespace GatherUp.Infrastructure.Mail
 {
     public class SmtpMailService : IMailService
     {
