@@ -41,24 +41,21 @@ public Event GetEventDetails(int eventId)
             return ev;
         }
 
-        public void GetEventsByUser(int userId)
+        public object GetEventsByUser(int userId)
         {
             IEnumerable<Event> allEvents = _eventRepo.GetAll();
 
-            Console.WriteLine("אירועים שאתה מנהל:");
-            allEvents.Where(e => e.EventManagerId == userId)
-                     .ToList()
-                     .ForEach(e => Console.WriteLine($"  - [{e.Id}] {e.Title} | {e.EventDate:dd/MM/yyyy}"));
+            List<Event> managerEvents = allEvents.Where(e => e.EventManagerId == userId).ToList();
+            List<Event> hostEvents = allEvents.Where(e => e.EventHostId == userId).ToList();
 
-            Console.WriteLine("אירועים שאתה בעל הבית:");
-            allEvents.Where(e => e.EventHostId == userId)
-                     .ToList()
-                     .ForEach(e => Console.WriteLine($"  - [{e.Id}] {e.Title} | {e.EventDate:dd/MM/yyyy}"));
+            List<Event> participantEvents = allEvents.Where(e => e.ParticipantIds != null && e.ParticipantIds.Contains(userId)).ToList();
 
-            Console.WriteLine("אירועים שאתה משתתף בהם:");
-            allEvents.Where(e => e.ParticipantIds.Contains(userId))
-                     .ToList()
-                     .ForEach(e => Console.WriteLine($"  - [{e.Id}] {e.Title} | {e.EventDate:dd/MM/yyyy}"));
+            return new
+            {
+                Managing = managerEvents,
+                Hosting = hostEvents,
+                Participating = participantEvents
+            };
         }
     }
 }
