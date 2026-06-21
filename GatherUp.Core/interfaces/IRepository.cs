@@ -13,7 +13,7 @@ namespace GatherUp.Core.Interfaces
             void Add(T entity);
             T GetById(int id);
             IEnumerable<T> GetAll();
-            void Update(T entity);
+            void Update(T entity);  
             void Delete(int id);
 
         }

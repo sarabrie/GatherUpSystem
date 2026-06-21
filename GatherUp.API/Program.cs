@@ -24,9 +24,11 @@ builder.Services.AddScoped<IRepository<Poll>, XmlRepository<Poll>>();
 builder.Services.AddScoped<IRepository<Person>, XmlRepository<Person>>();
 
 // ==========================================
-// Mail Service
+// Mail Service & Notification Bridge
 // ==========================================
 builder.Services.AddScoped<IMailService, FileMailService>();
+// ?? תוספת חובה: רישום הגשר כ-Singleton כדי לשמור על האירועים בזיכרון
+builder.Services.AddSingleton<IMailNotificationBridge, SimpleNotificationBridge>();
 
 // ==========================================
 // BL Services
@@ -36,6 +38,8 @@ builder.Services.AddScoped<EventsService>();
 builder.Services.AddScoped<EventManagerService>();
 builder.Services.AddScoped<FinanceService>();
 builder.Services.AddScoped<PollService>();
+// ?? תוספת: רישום שירות ההתראות מה-BL שלכן
+builder.Services.AddScoped<NotificationService>();
 
 // ==========================================
 // Controllers & Swagger
