@@ -4,12 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GatherUp.Core.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 using GatherUp.Core.DO.Polls;
 namespace GatherUp.Core.DO.Polls
 {
     public class Poll:IEntity
     {
+        [SetsRequiredMembers]
+        public Poll() { }
+
         [XmlAttribute]
         public int Id {  get; set; }
         [XmlElement]

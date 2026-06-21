@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace GatherUp.Core.DO.Users
 {
     public class EventManager : Person
     {
+        [SetsRequiredMembers]
+        public EventManager() { }
     }
 }

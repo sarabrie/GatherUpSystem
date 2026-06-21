@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 using GatherUp.Core.Enums;
 
 
@@ -11,6 +12,9 @@ namespace GatherUp.Core.DO.Users
     
     public class Participant : Person
     {
+        [SetsRequiredMembers]
+        public Participant() { }
+
         public bool? IsAttending { get; set; } = false;
         public bool HasPaid { get; set; }=false;
         public decimal AmountContributed { get; set; }=Decimal.Zero;

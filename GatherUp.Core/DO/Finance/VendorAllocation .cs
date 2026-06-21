@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 using GatherUp.Core.Interfaces;
 
@@ -7,6 +8,9 @@ namespace GatherUp.Core.DO.Finance
 {
     public class VendorAllocation : IEntity
     {
+        [SetsRequiredMembers]
+        public VendorAllocation() { }
+
         [XmlAttribute]
         public int Id { get; set; }
 

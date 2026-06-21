@@ -8,7 +8,7 @@ using GatherUp.Core.DO.Finance;
 using GatherUp.Core.DO.Polls;
 using GatherUp.Core.Interfaces;
 using GatherUp.Infrastructure.Data;
-using GatherUp.Infrastructure.Services;
+using GatherUp.Infrastructure.Mail;
 using GatherUp.BL.Services;
 
 namespace GatherUp.Tests
