@@ -27,7 +27,16 @@ builder.Services.AddScoped<IRepository<Person>, XmlRepository<Person>>();
 // ==========================================
 // Mail Service & Notification Bridge
 // ==========================================
-builder.Services.AddScoped<IMailService, FileMailService>();
+builder.Services.AddScoped<IMailService>(provider =>
+{
+    IConfiguration config = provider.GetRequiredService<IConfiguration>();
+    string host      = config["Smtp:Host"] ?? "smtp.gmail.com";
+    int    port      = int.Parse(config["Smtp:Port"] ?? "587");
+    string username  = config["Smtp:Username"] ?? string.Empty;
+    string password  = config["Smtp:Password"] ?? string.Empty;
+    string fromEmail = config["Smtp:FromEmail"] ?? string.Empty;
+    return new SmtpMailService(host, port, username, password, fromEmail);
+});
 // 🌟 תוספת חובה: רישום הגשר כ-Singleton כדי לשמור על האירועים בזיכרון
 builder.Services.AddSingleton<IMailNotificationBridge, SimpleNotificationBridge>();
 

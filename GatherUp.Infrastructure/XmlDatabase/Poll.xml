@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ArrayOfPoll xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Poll Id="0">
-    <Title />
-    <Description />
-  </Poll>
   <Poll Id="1">
-    <Title>מתי המסיבה?</Title>
-    <Description>מתי המסיבה תתקיים?</Description>
-  </Poll>
-  <Poll Id="2">
-    <Title>מתי המסיבה?</Title>
-    <Description>דגכעיחל</Description>
+    <Title>תאריך</Title>
+    <Description />
+    <Questions QuestionId="1">
+      <QuestionText>מתי תרצו שתתקיים המסיבה?</QuestionText>
+      <Options>היום</Options>
+      <Options>מחר</Options>
+      <Options>מחרותיים</Options>
+      <Options>שבוע הבא</Options>
+      <ParticipantVotes />
+    </Questions>
   </Poll>
 </ArrayOfPoll>

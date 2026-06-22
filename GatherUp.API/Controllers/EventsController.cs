@@ -66,7 +66,7 @@ namespace GatherUp.API.Controllers
         [HttpPost("{eventId}/coordinate-schedule")]
         public IActionResult CoordinateSchedule(int eventId, [FromBody] Poll schedulePoll)
         {
-            _pollService.CreatePoll(schedulePoll);
+            _pollService.CreatePoll(eventId, schedulePoll);
             return Ok("סקר לתיאום לוחות זמנים נוצר בהצלחה.");
         }
 

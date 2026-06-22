@@ -131,7 +131,7 @@
                 await createEvent({ title, location, eventDate: date, participantIds: [], vendorIds: [], pollIds: [] });
                 showSuccess('האירוע נוצר בהצלחה!');
                 closeModalById('modal-create-event');
-                loadEvents();
+                await loadEvents();
             } catch (e) { showError(e.message); }
         }
 

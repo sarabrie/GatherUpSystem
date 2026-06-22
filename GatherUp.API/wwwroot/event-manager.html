@@ -177,6 +177,11 @@
         <div class="modal-title">+ הוספת סקר חדש</div>
         <div class="field"><label>כותרת הסקר</label><input id="poll-title" type="text" placeholder="שם הסקר"></div>
         <div class="field"><label>תיאור</label><textarea id="poll-desc" placeholder="תיאור"></textarea></div>
+        <div class="field"><label>שאלה</label><input id="poll-question" type="text" placeholder="הכנס שאלה"></div>
+        <div class="field"><label>אפשרות תשובה 1</label><input id="poll-opt1" type="text" placeholder="אפשרות 1"></div>
+        <div class="field"><label>אפשרות תשובה 2</label><input id="poll-opt2" type="text" placeholder="אפשרות 2"></div>
+        <div class="field"><label>אפשרות תשובה 3</label><input id="poll-opt3" type="text" placeholder="אפשרות 3"></div>
+        <div class="field"><label>אפשרות תשובה 4</label><input id="poll-opt4" type="text" placeholder="אפשרות 4"></div>
         <div class="modal-actions">
             <button class="btn btn-primary" onclick="doCreatePoll()">צור סקר</button>
             <button class="btn btn-outline" onclick="closeModalById('modal-add-poll')">ביטול</button>
@@ -264,7 +269,7 @@
             });
             showSuccess('האירוע עודכן בהצלחה!');
             toggleEdit();
-            loadDetails();
+            await loadDetails();
         } catch(e) { showError(e.message); }
     }
 
@@ -286,7 +291,7 @@
             await addParticipant(eventId, { name, email, isAttending: false, hasPaid: false, amountContributed: 0, mailingPreferences: [] });
             showSuccess('המשתתף נוסף!');
             closeModalById('modal-add-participant');
-            loadParticipants();
+            await loadParticipants();
         } catch(e) { showError(e.message); }
     }
 
@@ -316,14 +321,28 @@
     }
 
     async function doCreatePoll() {
-        const title = document.getElementById('poll-title').value.trim();
-        const desc  = document.getElementById('poll-desc').value.trim();
-        if (!title) { showError('יש להזין כותרת לסקר'); return; }
+        const title    = document.getElementById('poll-title').value.trim();
+        const desc     = document.getElementById('poll-desc').value.trim();
+        const question = document.getElementById('poll-question').value.trim();
+        const opt1     = document.getElementById('poll-opt1').value.trim();
+        const opt2     = document.getElementById('poll-opt2').value.trim();
+        const opt3     = document.getElementById('poll-opt3').value.trim();
+        const opt4     = document.getElementById('poll-opt4').value.trim();
+        if (!title || !question || !opt1 || !opt2 || !opt3 || !opt4) { showError('יש למלא כותרת, שאלה ו-4 אפשרויות'); return; }
         try {
-            await createPoll(eventId, { title, description: desc, questions: [] });
+            await createPoll(eventId, {
+                title,
+                description: desc,
+                questions: [{
+                    questionId: 1,
+                    questionText: question,
+                    options: [opt1, opt2, opt3, opt4],
+                    participantVotes: {}
+                }]
+            });
             showSuccess('הסקר נוצר!');
             closeModalById('modal-add-poll');
-            loadPolls();
+            await loadPolls();
         } catch(e) { showError(e.message); }
     }
 
@@ -356,7 +375,7 @@
             await addReceipt({ receiptNumber, amount, receiptFilePath, date: new Date().toISOString() });
             showSuccess('הקבלה נוספה!');
             closeModalById('modal-add-receipt');
-            loadFinance();
+            await loadFinance();
         } catch(e) { showError(e.message); }
     }
 
@@ -378,7 +397,7 @@
             await addSupplier(eventId, { name, amountOwed: amountOwed || 0, hasReceipt: false, receiptIds: [] });
             showSuccess('הספק נוסף!');
             closeModalById('modal-add-supplier');
-            loadSuppliers();
+            await loadSuppliers();
         } catch(e) { showError(e.message); }
     }
 

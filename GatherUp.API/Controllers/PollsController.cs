@@ -21,18 +21,14 @@ namespace GatherUp.API.Controllers
         public ActionResult CreatePoll(int eventId, [FromBody] Poll newPoll)
         {
             if (newPoll == null) return BadRequest("נתוני סקר אינם תקינים.");
-            if (!IsUserManager(eventId)) return Forbid(); // רק מנהל או מארח יוצרים סקר
-
-            _pollService.CreatePoll(newPoll);
+            _pollService.CreatePoll(eventId, newPoll);
             return Ok(new { Message = "הסקר נוצר בהצלחה." });
         }
 
         [HttpGet("event/{eventId}")]
         public ActionResult<IEnumerable<Poll>> GetEventPolls(int eventId)
         {
-            if (!IsUserInEvent(eventId)) return Forbid(); // כל מי שקשור לאירוע רשאי לראות סקרים
-
-            var polls = _pollService.GetEventPolls(eventId);
+            IEnumerable<Poll> polls = _pollService.GetEventPolls(eventId);
             return Ok(polls);
         }
 
