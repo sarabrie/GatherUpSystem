@@ -44,8 +44,15 @@ namespace GatherUp.API.Controllers
         {
             if (req == null) return BadRequest(new { error = "נתונים לא תקינים." });
             var user = _personRepo.GetById(GetCurrentUserId());
-            _pollService.SubmitAnswer(pollId, user.Name, req.Answers);
-            return Ok(new { message = "תשובותך נשמרו בהצלחה." });
+            try
+            {
+                _pollService.SubmitAnswer(pollId, user.Name, req.Answers);
+                return Ok(new { message = "תשובותך נשמרו בהצלחה." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpGet("{pollId}/questions/{questionId}/results")]

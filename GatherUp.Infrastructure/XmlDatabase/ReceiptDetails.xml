@@ -1,2 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Receipts />
+<Receipts>
+  <Receipt Id="0">
+    <ReceiptNumber>12345</ReceiptNumber>
+    <Amount>100</Amount>
+    <ReceiptFilePath>C:\Users\Miri Levi\OneDrive\מסמכים\project_cs\GatherUp.Infrastructure\ReceiptFiles\0_</ReceiptFilePath>
+    <Date>2026-06-23T01:36:35</Date>
+  </Receipt>
+</Receipts>

@@ -72,22 +72,20 @@ namespace GatherUp.API.Controllers
                 request.Event.EventHostId = host.Id;
             }
 
-            List<Poll> polls = new();
-            if (request.LocationPoll != null) polls.Add(request.LocationPoll);
-            if (request.DatePoll != null) polls.Add(request.DatePoll);
+            var polls = new[] { request.LocationPoll, request.DatePoll }
+                .Where(p => p != null)
+                .ToList();
 
-            List<Participant> participants = new();
-            foreach (var email in request.ParticipantEmails ?? new List<string>())
-            {
-                Person? p = _personRepo.GetAll().FirstOrDefault(x => x.Email == email);
-                if (p != null)
-                    participants.Add(new Participant { Id = p.Id, Email = p.Email, Name = p.Name });
-            }
+            var participants = (request.ParticipantEmails ?? new List<string>())
+                .Select(email => _personRepo.GetAll().FirstOrDefault(x => x.Email == email))
+                .Where(p => p != null)
+                .Select(p => new Participant { Id = p!.Id, Email = p.Email, Name = p.Name })
+                .ToList();
 
             _eventsService.AddEvent(
                 request.Event,
-                participants.Count > 0 ? participants : null,
-                polls.Count > 0 ? polls : null
+                participants.Any() ? participants : null,
+                polls.Any() ? polls : null
             );
 
             return Ok(new { message = "האירוע נוצר בהצלחה.", participantsAdded = participants.Count, pollsAdded = polls.Count });

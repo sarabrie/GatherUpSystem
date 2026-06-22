@@ -66,12 +66,15 @@ namespace GatherUp.BL.Services
             Poll poll = _pollRepo.GetAll().FirstOrDefault(p => p.Id == pollId);
             if (poll == null) throw new KeyNotFoundException($"סקר {pollId} לא נמצא.");
 
-            foreach (var answer in answers)
-            {
-                var question = poll.Questions.FirstOrDefault(q => q.QuestionId == answer.Key);
-                if (question != null)
-                    question.ParticipantVotes[participantName] = answer.Value;
-            }
+            bool alreadyVoted = poll.Questions != null &&
+                poll.Questions.Any(q => q.ParticipantVotes.ContainsKey(participantName));
+            if (alreadyVoted) throw new InvalidOperationException($"{participantName} כבר ענה על סקר זה.");
+
+            answers.Select(answer => poll.Questions.FirstOrDefault(q => q.QuestionId == answer.Key))
+                .Where(question => question != null)
+                .Select(question => { question!.ParticipantVotes[participantName] = answers[question.QuestionId]; return question; })
+                .ToList();
+
             _pollRepo.Update(poll);
         }
 

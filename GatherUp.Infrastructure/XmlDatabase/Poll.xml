@@ -9,7 +9,9 @@
       <Options>רחוב</Options>
       <Options>שכונה</Options>
       <Options>סמינר</Options>
-      <ParticipantVotes />
+      <ParticipantVotes>
+        <Vote ParticipantName="אילה מודל" ChosenOptionIndex="2" />
+      </ParticipantVotes>
     </Questions>
   </Poll>
   <Poll Id="2">
@@ -22,7 +24,7 @@
       <Options>שכונה</Options>
       <Options>סמינר</Options>
       <ParticipantVotes>
-        <Vote ParticipantName="אילה" ChosenOptionIndex="1" />
+        <Vote ParticipantName="אילה" ChosenOptionIndex="0" />
       </ParticipantVotes>
     </Questions>
   </Poll>
@@ -35,7 +37,9 @@
       <Options>מחר</Options>
       <Options>מחרותיים</Options>
       <Options>שבוע הבא</Options>
-      <ParticipantVotes />
+      <ParticipantVotes>
+        <Vote ParticipantName="אילה מודל" ChosenOptionIndex="3" />
+      </ParticipantVotes>
     </Questions>
   </Poll>
   <Poll Id="4">
@@ -47,7 +51,9 @@
       <Options>חךלף</Options>
       <Options>מצת</Options>
       <Options>ךלף</Options>
-      <ParticipantVotes />
+      <ParticipantVotes>
+        <Vote ParticipantName="אילה" ChosenOptionIndex="2" />
+      </ParticipantVotes>
     </Questions>
   </Poll>
   <Poll Id="5">
@@ -59,6 +65,56 @@
       <Options>חךלף</Options>
       <Options>מצת</Options>
       <Options>ךלף</Options>
+      <ParticipantVotes>
+        <Vote ParticipantName="אילה" ChosenOptionIndex="3" />
+      </ParticipantVotes>
+    </Questions>
+  </Poll>
+  <Poll Id="6">
+    <Title>שלום</Title>
+    <Description>מה קורה</Description>
+    <Questions QuestionId="1">
+      <QuestionText>מתי תרצו שתתקיים המסיבה?</QuestionText>
+      <Options>היום</Options>
+      <Options>מחר</Options>
+      <Options>מחרותיים</Options>
+      <Options>שבוע הבא</Options>
+      <ParticipantVotes />
+    </Questions>
+  </Poll>
+  <Poll Id="7">
+    <Title>שלום</Title>
+    <Description>מה קורה</Description>
+    <Questions QuestionId="1">
+      <QuestionText>מתי תרצו שתתקיים המסיבה?</QuestionText>
+      <Options>היום</Options>
+      <Options>מחר</Options>
+      <Options>מחרותיים</Options>
+      <Options>שבוע הבא</Options>
+      <ParticipantVotes />
+    </Questions>
+  </Poll>
+  <Poll Id="8">
+    <Title>שלום</Title>
+    <Description>מה קורה</Description>
+    <Questions QuestionId="1">
+      <QuestionText>מתי תרצו שתתקיים המסיבה?</QuestionText>
+      <Options>היום</Options>
+      <Options>מחר</Options>
+      <Options>מחרותיים</Options>
+      <Options>שבוע הבא</Options>
+      <ParticipantVotes />
+    </Questions>
+  </Poll>
+  <Poll Id="9">
+    <Title>שלום</Title>
+    <Description>מה קורה</Description>
+    <Questions QuestionId="1">
+      <QuestionText>מתי תרצו שתתקיים המסיבה?</QuestionText>
+      <Options>היום</Options>
+      <Options>מחר</Options>
+      <Options>מחרותיים</Options>
+      <Options>שבוע הבא</Options>
       <ParticipantVotes />
     </Questions>
   </Poll>

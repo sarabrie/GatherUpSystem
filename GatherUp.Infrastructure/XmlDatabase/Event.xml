@@ -35,7 +35,9 @@
     <PollIds>
       <int>2</int>
     </PollIds>
-    <ReceiptIds />
+    <ReceiptIds>
+      <int>0</int>
+    </ReceiptIds>
   </Event>
   <Event Id="3">
     <Title>חתונה לציפי!!!!!!!!!!</Title>
@@ -51,6 +53,10 @@
     <PollIds>
       <int>4</int>
       <int>5</int>
+      <int>6</int>
+      <int>7</int>
+      <int>8</int>
+      <int>9</int>
     </PollIds>
     <ReceiptIds />
   </Event>

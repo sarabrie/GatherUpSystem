@@ -46,7 +46,6 @@
         <div class="stat-row">
             <div class="stat"><div class="val" id="stat-total">—</div><div class="lbl">סה"כ משתתפים</div></div>
             <div class="stat"><div class="val" id="stat-attending">—</div><div class="lbl">אישרו הגעה</div></div>
-            <div class="stat"><div class="val" id="stat-polls">—</div><div class="lbl">סה"כ סקרים</div></div>
         </div>
     </div>
 
@@ -58,7 +57,6 @@
             <tbody id="participants-table"></tbody>
         </table>
     </div>
-</div>
 
 <script src="api.js"></script>
 <script>
@@ -78,43 +76,25 @@
                 <div class="info-item"><label>שעה</label><span>${ev.eventDate ? new Date(ev.eventDate).toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}) : '—'}</span></div>`;
         } catch(e) { showError(e.message); }
 
-        // טעינת משתתפים וסקרים במקביל
+        // טעינת משתתפים
         try {
-            const [participants, polls] = await Promise.all([
-                getParticipants(eventId),
-                getEventPolls(eventId)
-            ]);
+            const participants = await getParticipants(eventId);
 
             // סטטיסטיקות
             const attending = (participants || []).filter(p => p.isAttending).length;
             document.getElementById('stat-total').textContent    = (participants || []).length;
             document.getElementById('stat-attending').textContent = attending;
-            document.getElementById('stat-polls').textContent    = (polls || []).length;
-
-            // בניית כותרות עמודות סקרים
-            const header = document.getElementById('table-header');
-            (polls || []).forEach(p => {
-                const th = document.createElement('th');
-                th.textContent = p.title;
-                header.appendChild(th);
-            });
 
             // בניית שורות משתתפים
             const tb = document.getElementById('participants-table');
-            if (!participants || participants.length === 0) {
-                tb.innerHTML = '<tr><td colspan="10" class="empty">אין משתתפים</td></tr>';
+            const confirmedParticipants = (participants || []).filter(p => p.isAttending === true);
+            if (confirmedParticipants.length === 0) {
+                tb.innerHTML = '<tr><td colspan="2" class="empty">אין משתתפים שאישרו הגעה</td></tr>';
                 return;
             }
-            tb.innerHTML = participants.map(p => {
-                const attendCell = p.isAttending
-                    ? '<span class="check">✔</span>'
-                    : '<span class="cross">✘</span>';
-                // לכל סקר — אין מידע ישיר מהAPI אם ענה, אז מציגים לפי isAttending כסימן כללי
-                const pollCells = (polls || []).map(() =>
-                    p.isAttending ? '<td><span class="check">✔</span></td>' : '<td><span class="cross">✘</span></td>'
-                ).join('');
-                return `<tr><td>${p.name}</td><td>${attendCell}</td>${pollCells}</tr>`;
-            }).join('');
+            tb.innerHTML = confirmedParticipants.map(p =>
+                `<tr><td>${p.name}</td><td><span class="check">✔</span></td></tr>`
+            ).join('');
 
         } catch(e) { showError(e.message); }
     }
