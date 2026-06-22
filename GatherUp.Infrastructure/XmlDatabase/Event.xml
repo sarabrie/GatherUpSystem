@@ -14,4 +14,19 @@
       <int>1</int>
     </PollIds>
   </Event>
+  <Event Id="2">
+    <Title>jdhd, xhuo</Title>
+    <EventDate>2026-06-26T00:00:00</EventDate>
+    <Location />
+    <EventManagerId>987654321</EventManagerId>
+    <EventHostId>123456789</EventHostId>
+    <ParticipantIds>
+      <int>2</int>
+      <int>123</int>
+    </ParticipantIds>
+    <VendorIds />
+    <PollIds>
+      <int>2</int>
+    </PollIds>
+  </Event>
 </ArrayOfEvent>
