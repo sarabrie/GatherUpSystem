@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using GatherUp.BL.Services;
 using GatherUp.Core.DO;
 using GatherUp.Core.DO.Polls;
@@ -8,21 +7,15 @@ using GatherUp.Core.DO.Users;
 
 namespace GatherUp.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     [Authorize]
-    public class EventsController : ControllerBase
+    public class EventsController : BaseApiController
     {
-        private readonly EventsService _eventsService;
         private readonly EventManagerService _eventManagerService;
         private readonly PollService _pollService;
 
-        public EventsController(
-            EventsService eventsService,
-            EventManagerService eventManagerService,
-            PollService pollService)
+        public EventsController(EventsService eventsService, EventManagerService eventManagerService, PollService pollService)
+            : base(eventsService)
         {
-            _eventsService = eventsService;
             _eventManagerService = eventManagerService;
             _pollService = pollService;
         }
@@ -30,9 +23,8 @@ namespace GatherUp.API.Controllers
         [HttpPost("create")]
         public IActionResult CreateEvent([FromBody] Event newEvent)
         {
-            string? userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdStr, out int userId))
-                return Unauthorized("מזהה משתמש לא חוקי.");
+            int userId = GetCurrentUserId(); // שימוש בחילוץ ה-ID המשותף מהאבא
+            if (userId <= 0) return Unauthorized("מזהה משתמש לא חוקי.");
 
             if (newEvent.EventManagerId <= 0)
                 newEvent.EventManagerId = userId;
@@ -42,9 +34,10 @@ namespace GatherUp.API.Controllers
         }
 
         [HttpGet("{eventId}")]
-        [AllowAnonymous]
-        public IActionResult GetEvent(int eventId)
+        public IActionResult GetEventDetails(int eventId)
         {
+            if (!IsUserInEvent(eventId)) return Forbid(); // בדיקת אבטחה מורחבת מהאבא
+
             Event ev = _eventsService.GetEventDetails(eventId);
             return Ok(ev);
         }
@@ -52,25 +45,21 @@ namespace GatherUp.API.Controllers
         [HttpGet("my-events")]
         public IActionResult GetMyEvents()
         {
-            string? userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdStr, out int userId))
-                return Unauthorized();
+            int userId = GetCurrentUserId();
+            if (userId <= 0) return Unauthorized();
 
-            _eventsService.GetEventsByUser(userId);
-            return Ok();
+            var userEvents = _eventsService.GetEventsByUser(userId);
+            return Ok(userEvents);
         }
 
         [HttpPut("{eventId}/edit")]
         public IActionResult EditEvent(int eventId, [FromBody] Event updatedEvent)
         {
-            string? userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdStr, out int userId))
-                return Unauthorized("מזהה משתמש לא חוקי.");
+            int userId = GetCurrentUserId();
+            if (userId <= 0) return Unauthorized();
 
             Event existingEvent = _eventsService.GetEventDetails(eventId);
-
-            if (existingEvent.EventManagerId != userId)
-                return Forbid();
+            if (existingEvent.EventManagerId != userId) return Forbid();
 
             _eventManagerService.UpdateEventDetails(eventId, updatedEvent);
             return Ok("האירוע עודכן בהצלחה.");

@@ -5,13 +5,13 @@ using GatherUp.Core.DO.Users;
 
 namespace GatherUp.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PersonController : ControllerBase
+    public class PersonController : BaseApiController
     {
         private readonly AuthService _authService;
 
-        public PersonController(AuthService authService)
+        // מכיוון שהוא יורש מ-BaseApiController, חובה להעביר את ה-EventsService לאבא בבנאי
+        public PersonController(AuthService authService, EventsService eventsService)
+            : base(eventsService)
         {
             _authService = authService;
         }
@@ -24,14 +24,17 @@ namespace GatherUp.API.Controllers
             return Ok("המשתמש נוצר בהצלחה.");
         }
 
-        // --- הפעולה החדשה לעריכת משתמש ---
         [HttpPut("edit")]
-        [Authorize] // רק משתמש שיש לו טוקן יכול לגשת לכאן
+        [Authorize]
         public IActionResult EditUser([FromBody] Person updatedUser)
         {
-            // ה-Middleware הגלובלי שיצרת קודם יתפוס אוטומטית שגיאות אם ה-BL יזרוק אותן
-            _authService.UpdateUser(updatedUser);
+            int currentUserId = GetCurrentUserId(); // שליפת ה-ID מהאבא
+            if (currentUserId <= 0) return Unauthorized("משתמש לא מזוהה.");
 
+            // 🌟 אבטחה קריטית: הכרחת העריכה לערוך רק את המשתמש המחובר עצמו!
+            updatedUser.Id = currentUserId;
+
+            _authService.UpdateUser(updatedUser);
             return Ok("פרטי המשתמש עודכנו בהצלחה.");
         }
     }

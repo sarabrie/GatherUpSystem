@@ -2,49 +2,45 @@
 using GatherUp.BL.Services;
 using GatherUp.Core.DO.Users;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GatherUp.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ParticipantsController : ControllerBase
+    [Authorize]
+    public class ParticipantsController : BaseApiController
     {
         private readonly EventManagerService _eventManagerService;
 
-        public ParticipantsController(EventManagerService eventManagerService)
+        public ParticipantsController(EventManagerService eventManagerService, EventsService eventsService)
+            : base(eventsService)
         {
             _eventManagerService = eventManagerService;
         }
 
-        // שליפת כל המשתתפים באירוע ספציפי
         [HttpGet("event/{eventId}")]
         public ActionResult<IEnumerable<Participant>> GetParticipants(int eventId)
         {
-            var participants = _eventManagerService.GetParticipantsForEvent(eventId);
+            if (!IsUserInEvent(eventId)) return Forbid(); // מנהל, מארח או משתתף רשום בלבד
+
+            IEnumerable<Participant> participants = _eventManagerService.GetParticipantsForEvent(eventId);
             return Ok(participants);
         }
 
-        // הוספת משתתף חדש לאירוע קיים
         [HttpPost("event/{eventId}")]
         public ActionResult AddParticipant(int eventId, [FromBody] Participant participant)
         {
-            if (participant == null)
-            {
-                return BadRequest("נתוני משתתף אינם תקינים.");
-            }
+            if (participant == null) return BadRequest("נתוני משתתף אינם תקינים.");
+            if (!IsUserManager(eventId)) return Forbid(); // רק מנהל או מארח יכולים להוסיף
 
             _eventManagerService.AddParticipantToEvent(eventId, participant);
             return Ok(new { Message = "המשתתף נוסף בהצלחה לאירוע." });
         }
 
-        // שליחת תזכורת במייל למשתתפי האירוע - מתוקן עם FromQuery
         [HttpPost("event/{eventId}/remind")]
         public ActionResult SendReminder(int eventId, [FromQuery] string reminderType)
         {
-            if (string.IsNullOrEmpty(reminderType))
-            {
-                return BadRequest("יש לספק סוג תזכורת.");
-            }
+            if (string.IsNullOrEmpty(reminderType)) return BadRequest("יש לספק סוג תזכורת.");
+            if (!IsUserManager(eventId)) return Forbid(); // רק מנהל או מארח יכולים לשלוח תזכורות
 
             _eventManagerService.SendReminderToParticipants(eventId, reminderType);
             return Ok(new { Message = "התזכורות נשלחו בהצלחה." });
