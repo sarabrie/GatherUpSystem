@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>GatherUp - יצירת משתמש</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { background: white; border-radius: 16px; padding: 40px; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .logo { text-align: center; margin-bottom: 28px; }
+        .logo h1 { font-size: 24px; color: #667eea; font-weight: 700; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+        input { width: 100%; padding: 10px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 16px; font-family: inherit; transition: border-color 0.2s; }
+        input:focus { outline: none; border-color: #667eea; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.88; }
+        .btn-primary { background: #667eea; color: white; margin-bottom: 12px; }
+        .back { text-align: center; margin-top: 12px; font-size: 13px; color: #888; }
+        .back a { color: #667eea; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo"><h1>יצירת משתמש חדש</h1></div>
+        <label>שם מלא</label>
+        <input id="name" type="text" placeholder="הכנס שם מלא">
+        <label>כתובת מייל</label>
+        <input id="email" type="email" placeholder="example@mail.com">
+        <button class="btn btn-primary" onclick="doRegister()">צור משתמש</button>
+        <div class="back"><a href="login.html">← חזרה לכניסה</a></div>
+    </div>
+    <script src="api.js"></script>
+    <script>
+        async function doRegister() {
+            const name  = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            if (!name || !email) { showError('יש למלא שם ומייל'); return; }
+            try {
+                await register(name, email);
+                showSuccess('המשתמש נוצר בהצלחה! מעביר לכניסה...');
+                setTimeout(() => location.href = 'login.html', 1500);
+            } catch (e) { showError(e.message); }
+        }
+    </script>
+</body>
+</html>

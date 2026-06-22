@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>GatherUp - האירועים שלי</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6fb; min-height: 100vh; }
+        header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 22px; }
+        .logout { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .container { max-width: 900px; margin: 32px auto; padding: 0 20px; }
+        .section { background: white; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .section-header h2 { font-size: 16px; color: #333; }
+        .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+        .badge-manager    { background: #e8f0fe; color: #667eea; }
+        .badge-participant{ background: #e6f9f0; color: #2ecc71; }
+        .badge-host       { background: #fef3e8; color: #e67e22; }
+        .event-list { list-style: none; }
+        .event-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 10px; margin-bottom: 8px; background: #f8f9ff; border: 1px solid #eee; cursor: pointer; transition: background 0.15s; }
+        .event-item:hover { background: #eef0fb; }
+        .event-name { font-size: 14px; font-weight: 600; color: #333; }
+        .event-date { font-size: 12px; color: #999; margin-top: 2px; }
+        .arrow { color: #aaa; font-size: 16px; }
+        .btn-add { background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .btn-add:hover { background: #5567d5; }
+        .empty { color: #bbb; font-size: 13px; padding: 8px 0; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal.open { display: flex; }
+        .modal-box { background: white; border-radius: 14px; padding: 28px; width: 400px; }
+        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; color: #333; }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; }
+        .field input { width: 100%; padding: 9px 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .field input:focus { outline: none; border-color: #667eea; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .btn { padding: 9px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-outline  { background: white; color: #667eea; border: 1.5px solid #667eea; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="greeting">👋 שלום</h1>
+        <button class="logout" onclick="doLogout()">התנתק</button>
+    </header>
+    <div class="container">
+        <div class="section">
+            <div class="section-header">
+                <h2>🗂️ אירועים בניהולי <span class="badge badge-manager">מנהל</span></h2>
+                <button class="btn-add" onclick="openModal('modal-create-event')">+ הוספת אירוע</button>
+            </div>
+            <ul class="event-list" id="list-managing"></ul>
+        </div>
+        <div class="section">
+            <div class="section-header">
+                <h2>🎟️ אירועים בהם אני משתתף <span class="badge badge-participant">משתתף</span></h2>
+            </div>
+            <ul class="event-list" id="list-participating"></ul>
+        </div>
+        <div class="section">
+            <div class="section-header">
+                <h2>👑 אירועים בבעלותי <span class="badge badge-host">בעל האירוע</span></h2>
+            </div>
+            <ul class="event-list" id="list-hosting"></ul>
+        </div>
+    </div>
+
+    <!-- Modal יצירת אירוע -->
+    <div id="modal-create-event" class="modal" onclick="closeModal(event,this)">
+        <div class="modal-box">
+            <div class="modal-title">+ יצירת אירוע חדש</div>
+            <div class="field"><label>כותרת</label><input id="new-title" type="text" placeholder="שם האירוע"></div>
+            <div class="field"><label>מיקום</label><input id="new-location" type="text" placeholder="מיקום"></div>
+            <div class="field"><label>תאריך</label><input id="new-date" type="date"></div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="doCreateEvent()">צור אירוע</button>
+                <button class="btn btn-outline" onclick="closeModalById('modal-create-event')">ביטול</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+        requireAuth();
+
+        function doLogout() { clearToken(); location.href = 'login.html'; }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleDateString('he-IL', { day:'numeric', month:'long', year:'numeric' });
+        }
+
+        function renderList(listId, events, targetPage) {
+            const ul = document.getElementById(listId);
+            ul.innerHTML = '';
+            if (!events || events.length === 0) {
+                ul.innerHTML = '<li class="empty">אין אירועים להצגה</li>';
+                return;
+            }
+            events.forEach(ev => {
+                const li = document.createElement('li');
+                li.className = 'event-item';
+                li.innerHTML = `<div><div class="event-name">${ev.title}</div><div class="event-date">${formatDate(ev.eventDate)}${ev.location ? ' | ' + ev.location : ''}</div></div><span class="arrow">›</span>`;
+                li.onclick = () => {
+                    localStorage.setItem('currentEventId', ev.id);
+                    location.href = targetPage;
+                };
+                ul.appendChild(li);
+            });
+        }
+
+        async function loadEvents() {
+            try {
+                const data = await getMyEvents();
+                renderList('list-managing',      data.managing,      'event-manager.html');
+                renderList('list-participating', data.participating, 'event-participant.html');
+                renderList('list-hosting',       data.hosting,       'event-host.html');
+            } catch (e) { showError('שגיאה בטעינת האירועים: ' + e.message); }
+        }
+
+        async function doCreateEvent() {
+            const title    = document.getElementById('new-title').value.trim();
+            const location = document.getElementById('new-location').value.trim();
+            const date     = document.getElementById('new-date').value;
+            if (!title || !date) { showError('יש למלא כותרת ותאריך'); return; }
+            try {
+                await createEvent({ title, location, eventDate: date, participantIds: [], vendorIds: [], pollIds: [] });
+                showSuccess('האירוע נוצר בהצלחה!');
+                closeModalById('modal-create-event');
+                loadEvents();
+            } catch (e) { showError(e.message); }
+        }
+
+        function openModal(id)    { document.getElementById(id).classList.add('open'); }
+        function closeModalById(id) { document.getElementById(id).classList.remove('open'); }
+        function closeModal(e, el)  { if (e.target === el) el.classList.remove('open'); }
+
+        loadEvents();
+    </script>
+</body>
+</html>

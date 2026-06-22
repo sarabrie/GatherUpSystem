@@ -14,7 +14,8 @@ namespace GatherUp.Infrastructure.Data
 
         public ReceiptRepository() : base()
         {
-            _receiptFilesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReceiptFiles");
+            string infrastructurePath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "GatherUp.Infrastructure"));
+            _receiptFilesFolder = Path.Combine(infrastructurePath, "ReceiptFiles");
             if (!Directory.Exists(_receiptFilesFolder))
             {
                 Directory.CreateDirectory(_receiptFilesFolder);

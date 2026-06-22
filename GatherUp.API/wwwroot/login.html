@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>GatherUp - כניסה</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card { background: white; border-radius: 16px; padding: 40px; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .logo { text-align: center; margin-bottom: 32px; }
+        .logo h1 { font-size: 28px; color: #667eea; font-weight: 700; }
+        .logo p { color: #888; font-size: 14px; margin-top: 4px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+        input { width: 100%; padding: 10px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 18px; transition: border-color 0.2s; }
+        input:focus { outline: none; border-color: #667eea; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.88; }
+        .btn-primary { background: #667eea; color: white; margin-bottom: 12px; }
+        .btn-outline { background: white; color: #667eea; border: 2px solid #667eea; }
+        .hint { font-size: 11px; color: #aaa; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">
+            <h1>GatherUp</h1>
+            <p>מערכת ניהול אירועים</p>
+        </div>
+        <label>כתובת מייל</label>
+        <input id="email" type="email" placeholder="example@mail.com">
+        <label>סיסמה (מספר ת"ז)</label>
+        <input id="password" type="number" placeholder="הכנס מספר ת&quot;ז">
+        <button class="btn btn-primary" onclick="doLogin()">כניסה</button>
+        <button class="btn btn-outline" onclick="location.href='register.html'">יצירת משתמש</button>
+        <p class="hint">הסיסמה היא מספר ת"ז שהוגדר בעת ההרשמה</p>
+    </div>
+    <script src="api.js"></script>
+    <script>
+        async function doLogin() {
+            const email = document.getElementById('email').value.trim();
+            const id    = parseInt(document.getElementById('password').value);
+            if (!email || !id) { showError('יש למלא מייל וסיסמה'); return; }
+            try {
+                await login(email, id);
+                location.href = 'home.html';
+            } catch (e) { showError(e.message); }
+        }
+    </script>
+</body>
+</html>

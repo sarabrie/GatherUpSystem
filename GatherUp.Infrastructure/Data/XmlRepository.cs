@@ -14,7 +14,8 @@ namespace GatherUp.Infrastructure.Data
         
         public XmlRepository()
         {
-            string folderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "XmlDatabase");
+            string projectPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "GatherUp.Infrastructure"));
+            string folderPath = Path.Combine(projectPath, "XmlDatabase");
 
             if (!Directory.Exists(folderPath))
             {

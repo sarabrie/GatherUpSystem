@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>GatherUp - האירועים שלי</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6fb; min-height: 100vh; }
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { font-size: 22px; }
+        .logout { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .container { max-width: 900px; margin: 32px auto; padding: 0 20px; }
+        .section { background: white; border-radius: 14px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .section-header h2 { font-size: 16px; color: #333; }
+        .badge {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .badge-manager { background: #e8f0fe; color: #667eea; }
+        .badge-participant { background: #e6f9f0; color: #2ecc71; }
+        .badge-host { background: #fef3e8; color: #e67e22; }
+        .event-list { list-style: none; }
+        .event-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background: #f8f9ff;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .event-item:hover { background: #eef0fb; }
+        .event-name { font-size: 14px; font-weight: 600; color: #333; }
+        .event-date { font-size: 12px; color: #999; margin-top: 2px; }
+        .arrow { color: #aaa; font-size: 16px; }
+        .btn-add {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-add:hover { background: #5567d5; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>👋 שלום, ישראל ישראלי</h1>
+        <button class="logout" onclick="location.href='login.html'">התנתק</button>
+    </header>
+    <div class="container">
+
+        <!-- אירועים בניהולי -->
+        <div class="section">
+            <div class="section-header">
+                <h2>🗂️ אירועים בניהולי <span class="badge badge-manager">מנהל</span></h2>
+                <button class="btn-add" onclick="location.href='event-manager.html'">+ הוספת אירוע</button>
+            </div>
+            <ul class="event-list">
+                <li class="event-item" onclick="location.href='event-manager.html'">
+                    <div>
+                        <div class="event-name">אירוע חברה שנתי GatherUp</div>
+                        <div class="event-date">15 ביולי 2025 | אולם גני האירועים</div>
+                    </div>
+                    <span class="arrow">›</span>
+                </li>
+                <li class="event-item" onclick="location.href='event-manager.html'">
+                    <div>
+                        <div class="event-name">כנס הטכנולוגיה השנתי</div>
+                        <div class="event-date">3 באוגוסט 2025 | מרכז הכנסים</div>
+                    </div>
+                    <span class="arrow">›</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- אירועים בהם אני משתתף -->
+        <div class="section">
+            <div class="section-header">
+                <h2>🎟️ אירועים בהם אני משתתף <span class="badge badge-participant">משתתף</span></h2>
+            </div>
+            <ul class="event-list">
+                <li class="event-item" onclick="location.href='event-participant.html'">
+                    <div>
+                        <div class="event-name">יום הולדת לרחל</div>
+                        <div class="event-date">20 ביוני 2025 | תל אביב</div>
+                    </div>
+                    <span class="arrow">›</span>
+                </li>
+                <li class="event-item" onclick="location.href='event-participant.html'">
+                    <div>
+                        <div class="event-name">חתונת כהן</div>
+                        <div class="event-date">1 בספטמבר 2025 | ירושלים</div>
+                    </div>
+                    <span class="arrow">›</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- אירועים בבעלותי -->
+        <div class="section">
+            <div class="section-header">
+                <h2>👑 אירועים בבעלותי <span class="badge badge-host">בעל האירוע</span></h2>
+            </div>
+            <ul class="event-list">
+                <li class="event-item" onclick="location.href='event-host.html'">
+                    <div>
+                        <div class="event-name">בר המצווה של דוד</div>
+                        <div class="event-date">10 באוקטובר 2025 | חיפה</div>
+                    </div>
+                    <span class="arrow">›</span>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>GatherUp - בעל האירוע</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6fb; }
+        header { background: linear-gradient(135deg, #e67e22, #d35400); color: white; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 18px; }
+        .back-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .container { max-width: 720px; margin: 28px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 14px; padding: 22px; margin-bottom: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .card-title { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 16px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .info-item label { font-size: 11px; color: #999; font-weight: 600; display: block; margin-bottom: 3px; }
+        .info-item span { font-size: 14px; color: #333; font-weight: 500; }
+        .stat-row { display: flex; gap: 16px; margin-bottom: 6px; }
+        .stat { flex: 1; background: #fef3e8; border-radius: 10px; padding: 14px; text-align: center; }
+        .stat .val { font-size: 22px; font-weight: 700; color: #e67e22; }
+        .stat .lbl { font-size: 12px; color: #888; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: #f4f6fb; padding: 10px 12px; text-align: right; font-size: 12px; color: #666; font-weight: 600; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+        .check { color: #2ecc71; } .cross { color: #e74c3c; }
+        .empty { color: #bbb; font-size: 13px; }
+    </style>
+</head>
+<body>
+<header>
+    <button class="back-btn" onclick="location.href='home.html'">← חזרה</button>
+    <h1 id="event-title">טוען...</h1>
+    <span style="width:80px"></span>
+</header>
+<div class="container">
+
+    <!-- פרטי האירוע -->
+    <div class="card">
+        <div class="card-title">פרטי האירוע</div>
+        <div class="info-grid" id="event-info"></div>
+    </div>
+
+    <!-- סטטיסטיקות -->
+    <div class="card">
+        <div class="card-title">סיכום סטטוס</div>
+        <div class="stat-row">
+            <div class="stat"><div class="val" id="stat-total">—</div><div class="lbl">סה"כ משתתפים</div></div>
+            <div class="stat"><div class="val" id="stat-attending">—</div><div class="lbl">אישרו הגעה</div></div>
+            <div class="stat"><div class="val" id="stat-polls">—</div><div class="lbl">סה"כ סקרים</div></div>
+        </div>
+    </div>
+
+    <!-- טבלת משתתפים -->
+    <div class="card">
+        <div class="card-title">מעקב משתתפים</div>
+        <table>
+            <thead><tr id="table-header"><th>שם</th><th>אישר הגעה</th></tr></thead>
+            <tbody id="participants-table"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+    requireAuth();
+    const eventId = parseInt(localStorage.getItem('currentEventId'));
+    if (!eventId) location.href = 'home.html';
+
+    async function loadPage() {
+        // טעינת פרטי אירוע
+        try {
+            const ev = await getEventDetails(eventId);
+            document.getElementById('event-title').textContent = ev.title;
+            document.getElementById('event-info').innerHTML = `
+                <div class="info-item"><label>מנהל האירוע (ID)</label><span>${ev.eventManagerId}</span></div>
+                <div class="info-item"><label>מיקום</label><span>${ev.location || '—'}</span></div>
+                <div class="info-item"><label>תאריך</label><span>${ev.eventDate ? new Date(ev.eventDate).toLocaleDateString('he-IL') : '—'}</span></div>
+                <div class="info-item"><label>שעה</label><span>${ev.eventDate ? new Date(ev.eventDate).toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'}) : '—'}</span></div>`;
+        } catch(e) { showError(e.message); }
+
+        // טעינת משתתפים וסקרים במקביל
+        try {
+            const [participants, polls] = await Promise.all([
+                getParticipants(eventId),
+                getEventPolls(eventId)
+            ]);
+
+            // סטטיסטיקות
+            const attending = (participants || []).filter(p => p.isAttending).length;
+            document.getElementById('stat-total').textContent    = (participants || []).length;
+            document.getElementById('stat-attending').textContent = attending;
+            document.getElementById('stat-polls').textContent    = (polls || []).length;
+
+            // בניית כותרות עמודות סקרים
+            const header = document.getElementById('table-header');
+            (polls || []).forEach(p => {
+                const th = document.createElement('th');
+                th.textContent = p.title;
+                header.appendChild(th);
+            });
+
+            // בניית שורות משתתפים
+            const tb = document.getElementById('participants-table');
+            if (!participants || participants.length === 0) {
+                tb.innerHTML = '<tr><td colspan="10" class="empty">אין משתתפים</td></tr>';
+                return;
+            }
+            tb.innerHTML = participants.map(p => {
+                const attendCell = p.isAttending
+                    ? '<span class="check">✔</span>'
+                    : '<span class="cross">✘</span>';
+                // לכל סקר — אין מידע ישיר מהAPI אם ענה, אז מציגים לפי isAttending כסימן כללי
+                const pollCells = (polls || []).map(() =>
+                    p.isAttending ? '<td><span class="check">✔</span></td>' : '<td><span class="cross">✘</span></td>'
+                ).join('');
+                return `<tr><td>${p.name}</td><td>${attendCell}</td>${pollCells}</tr>`;
+            }).join('');
+
+        } catch(e) { showError(e.message); }
+    }
+
+    loadPage();
+</script>
+</body>
+</html>

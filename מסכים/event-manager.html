@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>GatherUp - ניהול אירוע</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6fb; }
+        header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; padding: 14px 28px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        header h1 { font-size: 18px; }
+        .back-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .container { max-width: 960px; margin: 28px auto; padding: 0 20px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab {
+            padding: 9px 18px; border-radius: 8px; border: none;
+            background: white; color: #666; font-size: 13px; font-weight: 600;
+            cursor: pointer; border: 1.5px solid #ddd; transition: all 0.15s;
+        }
+        .tab.active, .tab:hover { background: #667eea; color: white; border-color: #667eea; }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* Cards */
+        .card { background: white; border-radius: 14px; padding: 22px; margin-bottom: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .card-title { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Form */
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; }
+        .field input, .field select, .field textarea {
+            width: 100%; padding: 9px 12px; border: 1.5px solid #ddd;
+            border-radius: 8px; font-size: 14px; font-family: inherit;
+        }
+        .field input:focus, .field textarea:focus { outline: none; border-color: #667eea; }
+        .field textarea { resize: vertical; min-height: 80px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        /* Buttons */
+        .btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #2ecc71; color: white; }
+        .btn-outline { background: white; color: #667eea; border: 1.5px solid #667eea; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: #f4f6fb; padding: 10px 12px; text-align: right; font-size: 12px; color: #666; font-weight: 600; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+        .check { color: #2ecc71; font-size: 16px; }
+        .cross { color: #e74c3c; font-size: 16px; }
+
+        /* Poll */
+        .poll-block { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+        .poll-title { font-weight: 700; margin-bottom: 10px; color: #333; }
+        .question-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+
+        /* Checkbox group */
+        .check-group label { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; color: #444; cursor: pointer; }
+        .check-group input[type=checkbox] { width: 16px; height: 16px; accent-color: #667eea; }
+
+        /* Finance */
+        .stat-row { display: flex; gap: 16px; margin-bottom: 18px; }
+        .stat { flex: 1; background: #f8f9ff; border-radius: 10px; padding: 14px; text-align: center; }
+        .stat .val { font-size: 22px; font-weight: 700; color: #667eea; }
+        .stat .lbl { font-size: 12px; color: #888; margin-top: 4px; }
+
+        /* Modal overlay */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal.open { display: flex; }
+        .modal-box { background: white; border-radius: 14px; padding: 28px; width: 380px; }
+        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; color: #333; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="back-btn" onclick="location.href='home.html'">← חזרה</button>
+    <h1>🗂️ אירוע חברה שנתי GatherUp</h1>
+    <span style="width:80px"></span>
+</header>
+
+<div class="container">
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('details', this)">פרטי אירוע</button>
+        <button class="tab" onclick="switchTab('participants', this)">משתתפים</button>
+        <button class="tab" onclick="switchTab('polls', this)">סקרים</button>
+        <button class="tab" onclick="switchTab('finance', this)">כספים וקבלות</button>
+        <button class="tab" onclick="switchTab('suppliers', this)">ספקים</button>
+        <button class="tab" onclick="switchTab('messages', this)">הודעות</button>
+        <button class="tab" onclick="switchTab('notifications', this)">התראות</button>
+    </div>
+
+    <!-- פרטי אירוע -->
+    <div id="panel-details" class="panel active">
+        <div class="card">
+            <div class="card-title">פרטי האירוע <button class="btn btn-outline btn-sm" onclick="toggleEdit()">✏️ ערוך</button></div>
+            <div class="two-col">
+                <div class="field"><label>כותרת</label><input id="f-title" value="אירוע חברה שנתי GatherUp" disabled></div>
+                <div class="field"><label>מיקום</label><input id="f-loc" value="אולם גני האירועים" disabled></div>
+                <div class="field"><label>תאריך</label><input id="f-date" type="date" value="2025-07-15" disabled></div>
+                <div class="field"><label>שעה</label><input id="f-time" type="time" value="19:00" disabled></div>
+                <div class="field"><label>בעל האירוע</label><input id="f-host" value="שרה ברייש" disabled></div>
+            </div>
+            <button id="save-btn" class="btn btn-success" style="display:none;margin-top:10px" onclick="toggleEdit()">💾 שמור</button>
+        </div>
+    </div>
+
+    <!-- משתתפים -->
+    <div id="panel-participants" class="panel">
+        <div class="card">
+            <div class="card-title">רשימת משתתפים <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-participant')">+ הוספת משתתף</button></div>
+            <table>
+                <thead><tr><th>שם</th><th>ענה על סקר</th><th>שילם ומגיע</th></tr></thead>
+                <tbody>
+                    <tr><td>ישראל ישראלי</td><td><span class="check">✔</span></td><td><span class="check">✔</span></td></tr>
+                    <tr><td>רחל אברהם</td><td><span class="cross">✘</span></td><td><span class="cross">✘</span></td></tr>
+                    <tr><td>יוסי לוי</td><td><span class="check">✔</span></td><td><span class="cross">✘</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- סקרים -->
+    <div id="panel-polls" class="panel">
+        <div class="card">
+            <div class="card-title">ניהול סקרים <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-poll')">+ הוספת סקר חדש</button></div>
+
+            <div class="poll-block">
+                <div class="poll-title">📊 סקר קולינריה</div>
+                <div class="question-row">
+                    <span>שאלה 1: האם תרצה מנה טבעונית?</span>
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-poll-results')">תוצאות</button>
+                </div>
+                <div class="question-row">
+                    <span>שאלה 2: באיזו שעה להגיש את הקינוחים?</span>
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-poll-results')">תוצאות</button>
+                </div>
+                <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openModal('modal-add-question')">+ הוספת שאלה</button>
+            </div>
+
+            <div class="poll-block">
+                <div class="poll-title">📊 סקר פרטים התחלתיים</div>
+                <div class="question-row">
+                    <span>שאלה 1: איזה מיקום מועדף עליך?</span>
+                    <button class="btn btn-outline btn-sm" onclick="openModal('modal-poll-results')">תוצאות</button>
+                </div>
+                <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="openModal('modal-add-question')">+ הוספת שאלה</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- כספים -->
+    <div id="panel-finance" class="panel">
+        <div class="card">
+            <div class="stat-row">
+                <div class="stat"><div class="val">750 ₪</div><div class="lbl">סה"כ הכנסות</div></div>
+                <div class="stat"><div class="val">15,000 ₪</div><div class="lbl">סה"כ חובות לספקים</div></div>
+                <div class="stat" style="color:#e74c3c"><div class="val" style="color:#e74c3c">-14,250 ₪</div><div class="lbl">מאזן</div></div>
+            </div>
+            <div class="card-title">קבלות <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-receipt')">+ הנפקת קבלה</button></div>
+            <table>
+                <thead><tr><th>מספר קבלה</th><th>כמות</th><th>תאריך</th><th>חובות</th><th>זיכויים</th></tr></thead>
+                <tbody>
+                    <tr><td>12344</td><td>15,000 ₪</td><td>01/06/2025</td><td>15,000 ₪</td><td>—</td></tr>
+                    <tr><td>99001</td><td>750 ₪</td><td>05/06/2025</td><td>—</td><td>750 ₪</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ספקים -->
+    <div id="panel-suppliers" class="panel">
+        <div class="card">
+            <div class="card-title">ניהול ספקים <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-supplier')">+ הוספת ספק</button></div>
+            <table>
+                <thead><tr><th>שם ספק</th><th>סכום חוב</th><th>יש קבלה</th></tr></thead>
+                <tbody>
+                    <tr><td>קייטרינג אסאדו הגורמה</td><td>15,000 ₪</td><td><span class="check">✔</span></td></tr>
+                    <tr><td>DJ שמעון</td><td>3,500 ₪</td><td><span class="cross">✘</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- הודעות -->
+    <div id="panel-messages" class="panel">
+        <div class="card">
+            <div class="card-title">שליחת הודעה</div>
+            <div class="field"><label>נמענים</label>
+                <select>
+                    <option>כל המשתתפים</option>
+                    <option>רק בעל האירוע</option>
+                </select>
+            </div>
+            <div class="field"><label>נושא</label><input type="text" placeholder="נושא ההודעה"></div>
+            <div class="field"><label>תוכן</label><textarea placeholder="כתוב את ההודעה כאן..."></textarea></div>
+            <button class="btn btn-primary">📨 שלח הודעה</button>
+        </div>
+    </div>
+
+    <!-- התראות -->
+    <div id="panel-notifications" class="panel">
+        <div class="card">
+            <div class="card-title">הגדרות התראות — אילו פעולות תרצה לקבל מייל?</div>
+            <div class="check-group">
+                <label><input type="checkbox" checked> אישור הגעה של משתתף</label>
+                <label><input type="checkbox" checked> מילוי סקר על ידי משתתף</label>
+                <label><input type="checkbox"> אישור תשלום</label>
+                <label><input type="checkbox" checked> הנפקת קבלה</label>
+                <label><input type="checkbox"> שליחת הודעה ממשתתף</label>
+                <label><input type="checkbox" checked> הצגת תוצאות סקר</label>
+            </div>
+            <button class="btn btn-success" style="margin-top:16px">💾 שמור הגדרות</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modals -->
+
+<div id="modal-add-participant" class="modal" onclick="closeModal(event, this)">
+    <div class="modal-box">
+        <div class="modal-title">+ הוספת משתתף</div>
+        <div class="field"><label>שם מלא</label><input type="text" placeholder="שם המשתתף"></div>
+        <div class="field"><label>מייל</label><input type="email" placeholder="מייל"></div>
+        <div class="modal-actions">
+            <button class="btn btn-primary">הוסף</button>
+            <button class="btn btn-outline" onclick="closeModalById('modal-add-participant')">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-add-poll" class="modal" onclick="closeModal(event, this)">
+    <div class="modal-box">
+        <div class="modal-title">+ הוספת סקר חדש</div>
+        <div class="field"><label>כותרת הסקר</label><input type="text" placeholder="שם הסקר"></div>
+        <div class="field"><label>תיאור</label><textarea placeholder="תיאור הסקר"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-primary">צור סקר</button>
+            <button class="btn btn-outline" onclick="closeModalById('modal-add-poll')">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-add-question" class="modal" onclick="closeModal(event, this)">
+    <div class="modal-box">
+        <div class="modal-title">+ הוספת שאלה לסקר</div>
+        <div class="field"><label>טקסט השאלה</label><input type="text" placeholder="מה השאלה?"></div>
+        <div class="field"><label>אפשרויות תשובה (מופרדות בפסיק)</label><input type="text" placeholder="תשובה 1, תשובה 2, תשובה 3"></div>
+        <div class="modal-actions">
+            <button class="btn btn-primary">הוסף שאלה</button>
+            <button class="btn btn-outline" onclick="closeModalById('modal-add-question')">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-poll-results" class="modal" onclick="closeModal(event, this)">
+    <div class="modal-box">
+        <div class="modal-title">📊 תוצאות השאלה</div>
+        <p style="font-size:13px;color:#555;margin-bottom:12px">האם תרצה מנה טבעונית?</p>
+        <div style="margin-bottom:8px;font-size:13px">כן, בטח! — <strong>7 קולות</strong></div>
+        <div style="margin-bottom:8px;font-size:13px">לא, מעדיף בשרי — <strong>3 קולות</strong></div>
+        <div style="font-size:13px">לא משנה לי — <strong>2 קולות</strong></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModalById('modal-poll-results')">סגור</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-add-receipt" class="modal" onclick="closeModal(event, this)">
+    <div class="modal-box">
+        <div class="modal-title">+ הנפקת קבלה</div>
+        <div class="field"><label>מספר קבלה</label><input type="text" placeholder="מספר קבלה"></div>
+        <div class="field"><label>סכום</label><input type="number" placeholder="0.00"></div>
+        <div class="field"><label>קובץ קבלה</label><input type="file"></div>
+        <div class="modal-actions">
+            <button class="btn btn-primary">הנפק</button>
+            <button class="btn btn-outline" onclick="closeModalById('modal-add-receipt')">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-add-supplier" class="modal" onclick="closeModal(event, this)">
+    <div class="modal-box">
+        <div class="modal-title">+ הוספת ספק</div>
+        <div class="field"><label>שם ספק</label><input type="text" placeholder="שם הספק"></div>
+        <div class="field"><label>סכום חוב</label><input type="number" placeholder="0.00"></div>
+        <div class="modal-actions">
+            <button class="btn btn-primary">צור</button>
+            <button class="btn btn-outline" onclick="closeModalById('modal-add-supplier')">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(name, el) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('panel-' + name).classList.add('active');
+        el.classList.add('active');
+    }
+    let editing = false;
+    function toggleEdit() {
+        editing = !editing;
+        ['f-title','f-loc','f-date','f-time','f-host'].forEach(id => {
+            document.getElementById(id).disabled = !editing;
+        });
+        document.getElementById('save-btn').style.display = editing ? 'inline-block' : 'none';
+    }
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModalById(id) { document.getElementById(id).classList.remove('open'); }
+    function closeModal(e, el) { if (e.target === el) el.classList.remove('open'); }
+</script>
+</body>
+</html>

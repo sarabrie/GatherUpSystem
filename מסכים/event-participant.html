@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>GatherUp - אירוע</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6fb; }
+        header {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white; padding: 14px 28px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        header h1 { font-size: 18px; }
+        .back-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .container { max-width: 720px; margin: 28px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 14px; padding: 22px; margin-bottom: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .card-title { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 16px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .info-item label { font-size: 11px; color: #999; font-weight: 600; display: block; margin-bottom: 3px; }
+        .info-item span { font-size: 14px; color: #333; font-weight: 500; }
+
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background: #2ecc71; color: white; }
+        .btn-outline { background: white; color: #2ecc71; border: 2px solid #2ecc71; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+        .payment-box {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            text-align: center;
+        }
+        .payment-box .lbl { font-size: 11px; color: #999; margin-bottom: 4px; }
+        .payment-box .val { font-size: 16px; font-weight: 700; color: #333; }
+        .paid-badge { background: #e6f9f0; color: #2ecc71; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .unpaid-badge { background: #fef0f0; color: #e74c3c; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+
+        .poll-block { border: 1px solid #eee; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+        .poll-name { font-weight: 600; font-size: 14px; margin-bottom: 10px; color: #333; }
+        .answered { color: #2ecc71; font-size: 12px; font-weight: 600; }
+        .not-answered { color: #e67e22; font-size: 12px; font-weight: 600; }
+
+        .check-group label { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; color: #444; cursor: pointer; }
+        .check-group input[type=checkbox] { width: 16px; height: 16px; accent-color: #2ecc71; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+        .modal.open { display: flex; }
+        .modal-box { background: white; border-radius: 14px; padding: 28px; width: 380px; }
+        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; color: #333; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .radio-option { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
+        .radio-option input { accent-color: #2ecc71; width: 16px; height: 16px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="back-btn" onclick="location.href='home.html'">← חזרה</button>
+    <h1>🎟️ יום הולדת לרחל</h1>
+    <span style="width:80px"></span>
+</header>
+
+<div class="container">
+
+    <!-- פרטי אירוע -->
+    <div class="card">
+        <div class="card-title">פרטי האירוע</div>
+        <div class="info-grid">
+            <div class="info-item"><label>כותרת</label><span>יום הולדת לרחל</span></div>
+            <div class="info-item"><label>מיקום</label><span>תל אביב, רסטורנט ים תיכוני</span></div>
+            <div class="info-item"><label>תאריך</label><span>20 ביוני 2025</span></div>
+            <div class="info-item"><label>שעה</label><span>20:00</span></div>
+            <div class="info-item"><label>בעל האירוע</label><span>רחל אברהם</span></div>
+        </div>
+    </div>
+
+    <!-- הגעה ותשלום -->
+    <div class="card">
+        <div class="card-title">הגעה ותשלום</div>
+        <div style="display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="this.textContent='✔ אישרתי הגעה'; this.style.background='#27ae60'">אישור הגעה</button>
+            <button class="btn btn-outline">ביטול הגעה</button>
+        </div>
+        <div class="payment-box">
+            <div><div class="lbl">סטטוס</div><div><span class="unpaid-badge">טרם שולם</span></div></div>
+            <div><div class="lbl">חוב</div><div class="val">200 ₪</div></div>
+            <div><div class="lbl">סכום ששולם</div><div class="val">0 ₪</div></div>
+            <div><div class="lbl">תאריך תשלום</div><div class="val">—</div></div>
+        </div>
+    </div>
+
+    <!-- סקרים -->
+    <div class="card">
+        <div class="card-title">סקרים פתוחים</div>
+
+        <div class="poll-block">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="poll-name">📊 סקר פרטים התחלתיים</div>
+                <span class="not-answered">לא ענית עדיין</span>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="openModal('modal-poll-answer')">ענה על סקר</button>
+        </div>
+
+        <div class="poll-block">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="poll-name">📊 סקר קולינריה</div>
+                <span class="answered">✔ ענית</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- הגדרות התראות -->
+    <div class="card">
+        <div class="card-title">הגדרות התראות — אילו עדכונים תרצה לקבל?</div>
+        <div class="check-group">
+            <label><input type="checkbox" checked> שינוי בפרטי האירוע</label>
+            <label><input type="checkbox" checked> פתיחת סקר חדש</label>
+            <label><input type="checkbox"> הודעה ישירה ממנהל האירוע</label>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;font-size:13px;padding:8px 16px">💾 שמור הגדרות</button>
+    </div>
+
+</div>
+
+<!-- Modal מענה על סקר -->
+<div id="modal-poll-answer" class="modal" onclick="closeModal(event, this)">
+    <div class="modal-box">
+        <div class="modal-title">📊 סקר פרטים התחלתיים</div>
+        <p style="font-size:13px;font-weight:600;color:#555;margin-bottom:12px">שאלה 1: איזה מיקום מועדף עליך?</p>
+        <div class="radio-option"><input type="radio" name="q1" value="1"> תל אביב</div>
+        <div class="radio-option"><input type="radio" name="q1" value="2"> ירושלים</div>
+        <div class="radio-option"><input type="radio" name="q1" value="3"> חיפה</div>
+        <p style="font-size:13px;font-weight:600;color:#555;margin:16px 0 12px">שאלה 2: איזה חודש הכי נוח לך?</p>
+        <div class="radio-option"><input type="radio" name="q2" value="1"> יוני</div>
+        <div class="radio-option"><input type="radio" name="q2" value="2"> יולי</div>
+        <div class="radio-option"><input type="radio" name="q2" value="3"> אוגוסט</div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="closeModalById('modal-poll-answer')">שלח</button>
+            <button class="btn btn-outline" onclick="closeModalById('modal-poll-answer')" style="color:#666;border-color:#ddd">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModalById(id) { document.getElementById(id).classList.remove('open'); }
+    function closeModal(e, el) { if (e.target === el) el.classList.remove('open'); }
+</script>
+</body>
+</html>

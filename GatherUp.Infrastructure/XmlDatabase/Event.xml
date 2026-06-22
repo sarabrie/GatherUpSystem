@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Event Id="0">
+    <Title>bday</Title>
+    <EventDate>2026-06-22T10:14:33.72Z</EventDate>
+    <Location>surale home</Location>
+    <EventManagerId>123</EventManagerId>
+    <EventHostId>123</EventHostId>
+    <ParticipantIds>0</ParticipantIds>
+    <VendorIds>0</VendorIds>
+    <PollIds>0</PollIds>
+  </Event>
+</ArrayOfEvent>
