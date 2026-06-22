@@ -27,8 +27,29 @@ namespace GatherUp.BL.Services
 
         public void AddEvent(Event newEvent, List<Participant> participants = null, List<Poll> polls = null)
         {
-            participants?.ForEach(p => { _participantRepo.Add(p); newEvent.ParticipantIds.Add(p.Id); });
-            polls?.ForEach(p => { _pollRepo.Add(p); newEvent.PollIds.Add(p.Id); });
+            // 1. שמור משתתפים (אם לא קיימים כבר)
+            if (participants != null)
+                foreach (var p in participants)
+                    if (!_participantRepo.GetAll().Any(x => x.Id == p.Id))
+                        _participantRepo.Add(p);
+
+            // 2. שמור סקרים
+            if (polls != null)
+                foreach (var poll in polls)
+                    _pollRepo.Add(poll);
+
+            // 3. הגדר IDs על ה-newEvent לפני השמירה
+            if (participants != null)
+                foreach (var p in participants)
+                    if (!newEvent.ParticipantIds.Contains(p.Id))
+                        newEvent.ParticipantIds.Add(p.Id);
+
+            if (polls != null)
+                foreach (var poll in polls)
+                    if (!newEvent.PollIds.Contains(poll.Id))
+                        newEvent.PollIds.Add(poll.Id);
+
+            // 4. שמור את האירוע עם כל ה-IDs כבר בתוכו
             _eventRepo.Add(newEvent);
         }
 

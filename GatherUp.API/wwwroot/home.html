@@ -30,12 +30,18 @@
         /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
         .modal.open { display: flex; }
-        .modal-box { background: white; border-radius: 14px; padding: 28px; width: 400px; }
+        .modal-box { background: white; border-radius: 14px; padding: 28px; width: 480px; max-height: 85vh; overflow-y: auto; }
         .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; color: #333; }
         .field { margin-bottom: 14px; }
         .field label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; }
-        .field input { width: 100%; padding: 9px 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
-        .field input:focus { outline: none; border-color: #667eea; }
+        .field input, .field select, .field textarea { width: 100%; padding: 9px 12px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .field input:focus, .field select:focus { outline: none; border-color: #667eea; }
+        .section-divider { font-size: 12px; font-weight: 700; color: #667eea; margin: 16px 0 10px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .poll-box { background: #f8f9ff; border-radius: 8px; padding: 12px; margin-top: 6px; }
+        .poll-box .field { margin-bottom: 8px; }
+        .toggle-link { font-size: 12px; color: #667eea; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; }
+        .participant-tag { display: inline-flex; align-items: center; gap: 6px; background: #e8f0fe; color: #667eea; padding: 4px 10px; border-radius: 20px; font-size: 12px; margin: 3px; }
+        .participant-tag span { cursor: pointer; font-weight: 700; }
         .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
         .btn { padding: 9px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
         .btn-primary { background: #667eea; color: white; }
@@ -73,9 +79,46 @@
     <div id="modal-create-event" class="modal" onclick="closeModal(event,this)">
         <div class="modal-box">
             <div class="modal-title">+ יצירת אירוע חדש</div>
-            <div class="field"><label>כותרת</label><input id="new-title" type="text" placeholder="שם האירוע"></div>
-            <div class="field"><label>מיקום</label><input id="new-location" type="text" placeholder="מיקום"></div>
+
+            <div class="field"><label>כותרת האירוע *</label><input id="new-title" type="text" placeholder="שם האירוע"></div>
+            <div class="field"><label>למי חוגגים? (בעל האירוע) *</label>
+                <select id="host-select"><option value="me">אני בעל האירוע</option></select>
+            </div>
+
+            <div class="section-divider">📍 מיקום</div>
+            <div class="field"><label>מיקום</label><input id="new-location" type="text" placeholder="מיקום האירוע"></div>
+            <span class="toggle-link" onclick="toggleSection('location-poll-box')">+ הוסף סקר מיקום</span>
+            <div id="location-poll-box" class="poll-box" style="display:none">
+                <div class="field"><label>שאלת הסקר</label><input id="loc-q" type="text" placeholder="איזה מיקום מועדף?"></div>
+                <div class="field"><label>אפשרות 1</label><input id="loc-o1" type="text"></div>
+                <div class="field"><label>אפשרות 2</label><input id="loc-o2" type="text"></div>
+                <div class="field"><label>אפשרות 3</label><input id="loc-o3" type="text"></div>
+                <div class="field"><label>אפשרות 4</label><input id="loc-o4" type="text"></div>
+            </div>
+
+            <div class="section-divider">📅 תאריך</div>
             <div class="field"><label>תאריך</label><input id="new-date" type="date"></div>
+            <span class="toggle-link" onclick="toggleSection('date-poll-box')">+ הוסף סקר תאריך</span>
+            <div id="date-poll-box" class="poll-box" style="display:none">
+                <div class="field"><label>שאלת הסקר</label><input id="date-q" type="text" placeholder="איזה תאריך מועדף?"></div>
+                <div class="field"><label>אפשרות 1</label><input id="date-o1" type="text"></div>
+                <div class="field"><label>אפשרות 2</label><input id="date-o2" type="text"></div>
+                <div class="field"><label>אפשרות 3</label><input id="date-o3" type="text"></div>
+                <div class="field"><label>אפשרות 4</label><input id="date-o4" type="text"></div>
+            </div>
+
+            <div class="section-divider">👤 מנהל האירוע</div>
+            <div class="field"><label>מנהל האירוע</label>
+                <select id="manager-select"><option value="me">אני המנהל</option></select>
+            </div>
+
+            <div class="section-divider">👥 הוספת משתתפים</div>
+            <div class="field" style="display:flex;gap:8px">
+                <select id="participant-select" style="flex:1"><option value="">-- בחר משתתף --</option></select>
+                <button class="btn btn-outline" style="white-space:nowrap" onclick="addParticipantTag()">+ הוסף</button>
+            </div>
+            <div id="participants-tags"></div>
+
             <div class="modal-actions">
                 <button class="btn btn-primary" onclick="doCreateEvent()">צור אירוע</button>
                 <button class="btn btn-outline" onclick="closeModalById('modal-create-event')">ביטול</button>
@@ -113,6 +156,21 @@
             });
         }
 
+        async function loadAllPersons() {
+            try {
+                const persons = await getAllPersons();
+                ['participant-select', 'host-select', 'manager-select'].forEach(selId => {
+                    const sel = document.getElementById(selId);
+                    persons.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.email;
+                        opt.textContent = `${p.name} (${p.email})`;
+                        sel.appendChild(opt);
+                    });
+                });
+            } catch(e) { /* silent */ }
+        }
+
         async function loadEvents() {
             try {
                 const data = await getMyEvents();
@@ -122,15 +180,79 @@
             } catch (e) { showError('שגיאה בטעינת האירועים: ' + e.message); }
         }
 
+        // משתתפים - תגיות
+        const participantEmails = [];
+        function addParticipantTag() {
+            const sel = document.getElementById('participant-select');
+            const email = sel.value;
+            const name  = sel.options[sel.selectedIndex]?.text;
+            if (!email || participantEmails.includes(email)) return;
+            participantEmails.push(email);
+            const tag = document.createElement('span');
+            tag.className = 'participant-tag';
+            tag.innerHTML = `${name} <span onclick="removeParticipantTag('${email}', this.parentElement)">×</span>`;
+            document.getElementById('participants-tags').appendChild(tag);
+            sel.value = '';
+        }
+        function removeParticipantTag(email, el) {
+            participantEmails.splice(participantEmails.indexOf(email), 1);
+            el.remove();
+        }
+
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function buildPoll(type, titleText) {
+            const q  = document.getElementById(`${type}-q`).value.trim();
+            const o1 = document.getElementById(`${type}-o1`).value.trim();
+            const o2 = document.getElementById(`${type}-o2`).value.trim();
+            if (!q || !o1 || !o2) return null;
+            const options = [o1, o2,
+                document.getElementById(`${type}-o3`).value.trim(),
+                document.getElementById(`${type}-o4`).value.trim()
+            ].filter(Boolean);
+            return { title: titleText, description: '', questions: [{ questionId: 1, questionText: q, options, participantVotes: {} }] };
+        }
+
         async function doCreateEvent() {
-            const title    = document.getElementById('new-title').value.trim();
-            const location = document.getElementById('new-location').value.trim();
-            const date     = document.getElementById('new-date').value;
-            if (!title || !date) { showError('יש למלא כותרת ותאריך'); return; }
+            const title       = document.getElementById('new-title').value.trim();
+            const hostEmail   = document.getElementById('host-select').value;
+            const managerEmail= document.getElementById('manager-select').value;
+            const location    = document.getElementById('new-location').value.trim();
+            const date        = document.getElementById('new-date').value;
+            if (!title || !date || !hostEmail) { showError('יש למלא כותרת, תאריך ובעל האירוע'); return; }
+
+            const iAmManager = managerEmail === 'me';
+            if (!iAmManager && !managerEmail) { showError('יש לבחור מנהל'); return; }
+
+            const locationPollBox = document.getElementById('location-poll-box');
+            const datePollBox     = document.getElementById('date-poll-box');
+            const locationPoll = locationPollBox.style.display !== 'none' ? buildPoll('loc', 'סקר מיקום') : null;
+            const datePoll     = datePollBox.style.display !== 'none'     ? buildPoll('date', 'סקר תאריך') : null;
+
+            // אסוף גם משתתף שנבחר אבל לא נלחץ "הוסף"
+            const selNow = document.getElementById('participant-select').value;
+            if (selNow && !participantEmails.includes(selNow)) participantEmails.push(selNow);
+
             try {
-                await createEvent({ title, location, eventDate: date, participantIds: [], vendorIds: [], pollIds: [] });
-                showSuccess('האירוע נוצר בהצלחה!');
+                const payload = {
+                    event: { title, location, eventDate: date || '0001-01-01', eventHostId: 0, eventManagerId: 0, participantIds: [], vendorIds: [], pollIds: [] },
+                    iAmManager,
+                    managerEmail: iAmManager ? '' : managerEmail,
+                    hostEmail: hostEmail === 'me' ? '' : hostEmail,
+                    participantEmails: [...participantEmails],
+                    locationPoll,
+                    datePoll
+                };
+                console.log('PAYLOAD:', JSON.stringify(payload, null, 2));
+                const result = await createEvent(payload);
+                console.log('RESULT:', result);
+                showSuccess(`האירוע נוצר! משתתפים: ${result.participantsAdded}, סקרים: ${result.pollsAdded}`);
                 closeModalById('modal-create-event');
+                participantEmails.length = 0;
+                document.getElementById('participants-tags').innerHTML = '';
                 await loadEvents();
             } catch (e) { showError(e.message); }
         }
@@ -139,6 +261,7 @@
         function closeModalById(id) { document.getElementById(id).classList.remove('open'); }
         function closeModal(e, el)  { if (e.target === el) el.classList.remove('open'); }
 
+        loadAllPersons();
         loadEvents();
     </script>
 </body>
