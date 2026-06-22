@@ -36,8 +36,6 @@ namespace GatherUp.API.Controllers
         [HttpGet("{eventId}")]
         public IActionResult GetEventDetails(int eventId)
         {
-            if (!IsUserInEvent(eventId)) return Forbid(); // בדיקת אבטחה מורחבת מהאבא
-
             Event ev = _eventsService.GetEventDetails(eventId);
             return Ok(ev);
         }
@@ -48,7 +46,7 @@ namespace GatherUp.API.Controllers
             int userId = GetCurrentUserId();
             if (userId <= 0) return Unauthorized();
 
-            var userEvents = _eventsService.GetEventsByUser(userId);
+            object userEvents = _eventsService.GetEventsByUser(userId);
             return Ok(userEvents);
         }
 

@@ -1,6 +1,6 @@
 // שורה 1 המעודכנת:
 // שורה 1 המעודכנת (התיקון):
-const API_BASE = 'https://localhost:7042/api';// ── Token helpers ──────────────────────────────────────────
+const API_BASE = 'https://localhost:7042/api';
 function saveToken(token) { localStorage.setItem('token', token); }
 function getToken()       { return localStorage.getItem('token'); }
 function clearToken()     { localStorage.removeItem('token'); localStorage.removeItem('currentEventId'); }
@@ -33,8 +33,8 @@ async function login(email, id) {
     return data;
 }
 
-async function register(name, email) {
-    return apiCall('POST', '/person/register', { name, email }, false);
+async function register(name, email, nationalId) {
+    return apiCall('POST', '/person/register', { id: nationalId, name, email }, false);
 }
 
 // ── Events ─────────────────────────────────────────────────

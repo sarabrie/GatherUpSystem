@@ -10,4 +10,27 @@
     <VendorIds>0</VendorIds>
     <PollIds>0</PollIds>
   </Event>
+  <Event Id="0">
+    <Title>חתונה</Title>
+    <EventDate>2026-07-29T00:00:00</EventDate>
+    <Location>אוביליון</Location>
+    <EventManagerId>123</EventManagerId>
+    <EventHostId>0</EventHostId>
+  </Event>
+  <Event Id="0">
+    <Title>חתונה אילה</Title>
+    <EventDate>2026-07-29T00:00:00</EventDate>
+    <Location>אוביליון</Location>
+    <EventManagerId>123456789</EventManagerId>
+    <EventHostId>0</EventHostId>
+  </Event>
+  <Event Id="1">
+    <Title>מסיבה לסיום הפרויקט</Title>
+    <EventDate>2026-06-22T00:00:00</EventDate>
+    <Location>הבית של שורלה</Location>
+    <EventManagerId>123456789</EventManagerId>
+    <EventHostId>0</EventHostId>
+    <ParticipantIds>1</ParticipantIds>
+    <ParticipantIds>2</ParticipantIds>
+  </Event>
 </ArrayOfEvent>

@@ -58,7 +58,11 @@ builder.Services.AddCors(options =>
 // ==========================================
 // Controllers & Swagger
 // ==========================================
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -125,6 +129,12 @@ if (app.Environment.IsDevelopment())
 // Middleware Pipeline (strict order)
 // ==========================================
 app.UseMiddleware<GlobalExceptionMiddleware>();
+
+DefaultFilesOptions defaultFiles = new DefaultFilesOptions();
+defaultFiles.DefaultFileNames.Clear();
+defaultFiles.DefaultFileNames.Add("login.html");
+app.UseDefaultFiles(defaultFiles);
+
 app.UseStaticFiles();
 app.UseRouting();
 

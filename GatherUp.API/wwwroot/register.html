@@ -26,17 +26,20 @@
         <input id="name" type="text" placeholder="הכנס שם מלא">
         <label>כתובת מייל</label>
         <input id="email" type="email" placeholder="example@mail.com">
+        <label>מספר תעודת זהות (ישמש כסיסמא)</label>
+        <input id="nationalId" type="number" placeholder="הכנס מספר ת&quot;ז">
         <button class="btn btn-primary" onclick="doRegister()">צור משתמש</button>
         <div class="back"><a href="login.html">← חזרה לכניסה</a></div>
     </div>
     <script src="api.js"></script>
     <script>
         async function doRegister() {
-            const name  = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            if (!name || !email) { showError('יש למלא שם ומייל'); return; }
+            const name       = document.getElementById('name').value.trim();
+            const email      = document.getElementById('email').value.trim();
+            const nationalId = parseInt(document.getElementById('nationalId').value);
+            if (!name || !email || !nationalId) { showError('יש למלא שם, מייל ומספר ת"ז'); return; }
             try {
-                await register(name, email);
+                await register(name, email, nationalId);
                 showSuccess('המשתמש נוצר בהצלחה! מעביר לכניסה...');
                 setTimeout(() => location.href = 'login.html', 1500);
             } catch (e) { showError(e.message); }

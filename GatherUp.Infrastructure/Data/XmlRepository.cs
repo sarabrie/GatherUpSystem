@@ -45,8 +45,13 @@ namespace GatherUp.Infrastructure.Data
         {
             List<T> currentData = GetAll().ToList();
 
-            currentData.Add(entity);
+            if (entity.Id == 0)
+            {
+                int nextId = currentData.Count > 0 ? currentData.Max(x => x.Id) + 1 : 1;
+                ((dynamic)entity).Id = nextId;
+            }
 
+            currentData.Add(entity);
             XMLSerializer.WriteToFile(_filePath, currentData);
         }
 

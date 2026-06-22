@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using GatherUp.BL.Services;
+using GatherUp.Core.DO;
 using System.Linq;
 
 namespace GatherUp.API.Controllers
@@ -41,10 +42,13 @@ namespace GatherUp.API.Controllers
             int currentUserId = GetCurrentUserId();
             if (currentUserId <= 0) return false;
 
-            var ev = _eventsService.GetEventDetails(eventId);
-            bool isParticipant = ev.ParticipantIds != null && ev.ParticipantIds.Contains(currentUserId);
-
-            return ev.EventManagerId == currentUserId || ev.EventHostId == currentUserId || isParticipant;
+            try
+            {
+                Event ev = _eventsService.GetEventDetails(eventId);
+                bool isParticipant = ev.ParticipantIds != null && ev.ParticipantIds.Contains(currentUserId);
+                return ev.EventManagerId == currentUserId || ev.EventHostId == currentUserId || isParticipant;
+            }
+            catch { return false; }
         }
     }
 }
