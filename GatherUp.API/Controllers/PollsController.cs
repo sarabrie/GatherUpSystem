@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using GatherUp.BL.Services;
 using GatherUp.Core.DO.Polls;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 
 namespace GatherUp.API.Controllers
 {
@@ -20,28 +19,25 @@ namespace GatherUp.API.Controllers
         [HttpPost("event/{eventId}")]
         public ActionResult CreatePoll(int eventId, [FromBody] Poll newPoll)
         {
-            if (newPoll == null) return BadRequest("נתוני סקר אינם תקינים.");
+            if (newPoll == null) return BadRequest(new { error = "נתוני סקר אינם תקינים." });
+            if (!IsUserManager(eventId)) return Forbid();
             _pollService.CreatePoll(eventId, newPoll);
-            return Ok(new { Message = "הסקר נוצר בהצלחה." });
+            return Ok(new { message = "הסקר נוצר בהצלחה." });
         }
 
         [HttpGet("event/{eventId}")]
-        public ActionResult<IEnumerable<Poll>> GetEventPolls(int eventId)
+        public ActionResult GetEventPolls(int eventId)
         {
-            IEnumerable<Poll> polls = _pollService.GetEventPolls(eventId);
-            return Ok(polls);
+            if (!IsUserInEvent(eventId)) return Forbid();
+            return Ok(_pollService.GetEventPolls(eventId));
         }
 
         [HttpGet("{pollId}/questions/{questionId}/results")]
-        public ActionResult<Dictionary<string, double>> GetQuestionResults(int pollId, int questionId)
+        public ActionResult GetQuestionResults(int pollId, int questionId)
         {
             if (!_pollService.IsPollValidAndActive(pollId))
-            {
-                return BadRequest("הסקר המבוקש אינו פעיל או תקין.");
-            }
-
-            var results = _pollService.CalculateQuestionResultsPercentages(pollId, questionId);
-            return Ok(results);
+                return BadRequest(new { error = "הסקר המבוקש אינו פעיל או תקין." });
+            return Ok(_pollService.CalculateQuestionResultsPercentages(pollId, questionId));
         }
     }
 }

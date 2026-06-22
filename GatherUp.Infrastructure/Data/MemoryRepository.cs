@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GatherUp.Core.Interfaces;
 
-namespace GatherUp.Infrastructure.Data.Memory
+namespace GatherUp.Infrastructure.Data
 {
     public class MemoryRepository<T> : IRepository<T> where T : class, IEntity
     {
