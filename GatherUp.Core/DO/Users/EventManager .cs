@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Xml.Serialization;
+using GatherUp.Core.Enums;
 
 namespace GatherUp.Core.DO.Users
 {
@@ -12,5 +8,8 @@ namespace GatherUp.Core.DO.Users
     {
         [SetsRequiredMembers]
         public EventManager() { }
+
+        [XmlElement]
+        public NotificationPreferences NotificationSettings { get; set; } = NotificationPreferences.None;
     }
 }

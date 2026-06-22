@@ -27,4 +27,22 @@
     <MailingPreferences />
     <NotificationSettings>EventChanges AdminMessages NewPolls</NotificationSettings>
   </Participant>
+  <Participant Id="987654321">
+    <Name>אילה מודל</Name>
+    <Email>AYALEVI@G.JCT.AC.IL</Email>
+    <IsAttending>false</IsAttending>
+    <HasPaid>false</HasPaid>
+    <AmountContributed>0</AmountContributed>
+    <MailingPreferences />
+    <NotificationSettings>EventChanges AdminMessages NewPolls</NotificationSettings>
+  </Participant>
+  <Participant Id="1234">
+    <Name>שרה ברייש</Name>
+    <Email>sarabr0278@gmail.com</Email>
+    <IsAttending>false</IsAttending>
+    <HasPaid>false</HasPaid>
+    <AmountContributed>0</AmountContributed>
+    <MailingPreferences />
+    <NotificationSettings>EventChanges AdminMessages NewPolls</NotificationSettings>
+  </Participant>
 </ArrayOfParticipant>

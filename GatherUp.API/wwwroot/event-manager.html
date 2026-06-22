@@ -147,14 +147,11 @@
         <div class="card">
             <div class="card-title">הגדרות התראות</div>
             <div class="check-group">
-                <label><input type="checkbox" checked> אישור הגעה של משתתף</label>
-                <label><input type="checkbox" checked> מילוי סקר על ידי משתתף</label>
-                <label><input type="checkbox"> אישור תשלום</label>
-                <label><input type="checkbox" checked> הנפקת קבלה</label>
-                <label><input type="checkbox"> הודעה ממשתתף</label>
-                <label><input type="checkbox" checked> תוצאות סקר</label>
+                <label><input type="checkbox" id="notif-changes" value="1"> שינויים באירוע</label>
+                <label><input type="checkbox" id="notif-messages" value="2"> הודעות מהמנהל</label>
+                <label><input type="checkbox" id="notif-polls" value="4"> סקרים חדשים</label>
             </div>
-            <button class="btn btn-success" style="margin-top:16px">💾 שמור הגדרות</button>
+            <button class="btn btn-success" style="margin-top:16px" onclick="doSaveNotifications()">💾 שמור הגדרות</button>
         </div>
     </div>
 </div>
@@ -202,8 +199,7 @@
     <div class="modal-box">
         <div class="modal-title">+ הנפקת קבלה</div>
         <div class="field"><label>מספר קבלה</label><input id="r-number" type="text" placeholder="מספר קבלה"></div>
-        <div class="field"><label>סכום</label><input id="r-amount" type="number" placeholder="0.00"></div>
-        <div class="field"><label>נתיב קובץ</label><input id="r-path" type="text" placeholder="נתיב לקובץ הקבלה"></div>
+        <div class="field"><label>סכום (שקל)</label><input id="r-amount" type="number" placeholder="0.00" min="0" step="0.01"></div>
         <div class="modal-actions">
             <button class="btn btn-primary" onclick="doAddReceipt()">הנפק</button>
             <button class="btn btn-outline" onclick="closeModalById('modal-add-receipt')">ביטול</button>
@@ -241,6 +237,7 @@
         if (name === 'polls')        loadPolls();
         if (name === 'finance')      loadFinance();
         if (name === 'suppliers')    loadSuppliers();
+        if (name === 'notifications') loadNotifications();
     }
 
     // ── Load event details ─────────────────────────────────
@@ -370,14 +367,15 @@
     }
 
     async function doAddReceipt() {
-        const receiptNumber  = document.getElementById('r-number').value.trim();
-        const amount         = parseFloat(document.getElementById('r-amount').value);
-        const receiptFilePath= document.getElementById('r-path').value.trim();
+        const receiptNumber = document.getElementById('r-number').value.trim();
+        const amount        = parseFloat(document.getElementById('r-amount').value);
         if (!receiptNumber || !amount) { showError('יש למלא מספר קבלה וסכום'); return; }
         try {
-            await addReceipt({ receiptNumber, amount, receiptFilePath, date: new Date().toISOString() });
-            showSuccess('הקבלה נוספה!');
+            await addReceipt(eventId, { receiptNumber, amount });
+            showSuccess('הקבלה הונפקה ונשמרת!');
             closeModalById('modal-add-receipt');
+            document.getElementById('r-number').value = '';
+            document.getElementById('r-amount').value = '';
             await loadFinance();
         } catch(e) { showError(e.message); }
     }
@@ -402,6 +400,25 @@
             closeModalById('modal-add-supplier');
             await loadSuppliers();
         } catch(e) { showError(e.message); }
+    }
+
+    // ── Messages ───────────────────────────────────────────
+    async function loadNotifications() {
+        try {
+            const data = await getNotifications();
+            const val = data.notificationSettings || 0;
+            document.getElementById('notif-changes').checked  = (val & 1) !== 0;
+            document.getElementById('notif-messages').checked = (val & 2) !== 0;
+            document.getElementById('notif-polls').checked    = (val & 4) !== 0;
+        } catch(e) { /* silent */ }
+    }
+    async function doSaveNotifications() {
+        let val = 0;
+        if (document.getElementById('notif-changes').checked)  val |= 1;
+        if (document.getElementById('notif-messages').checked) val |= 2;
+        if (document.getElementById('notif-polls').checked)    val |= 4;
+        try { await saveNotifications(val); showSuccess('הגדרות התראות נשמרו!'); }
+        catch(e) { showError(e.message); }
     }
 
     // ── Messages ───────────────────────────────────────────

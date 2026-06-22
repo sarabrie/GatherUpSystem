@@ -8,11 +8,16 @@
     <EventHostId>123</EventHostId>
     <ParticipantIds>
       <int>1</int>
+      <int>987654321</int>
     </ParticipantIds>
-    <VendorIds />
+    <VendorIds>
+      <int>2</int>
+    </VendorIds>
     <PollIds>
       <int>1</int>
+      <int>3</int>
     </PollIds>
+    <ReceiptIds />
   </Event>
   <Event Id="2">
     <Title>jdhd, xhuo</Title>
@@ -28,5 +33,20 @@
     <PollIds>
       <int>2</int>
     </PollIds>
+    <ReceiptIds />
+  </Event>
+  <Event Id="3">
+    <Title>חתונה לציפי!!!!!!!!!!</Title>
+    <EventDate>2026-08-13T00:00:00</EventDate>
+    <Location />
+    <EventManagerId>123456789</EventManagerId>
+    <EventHostId>987654321</EventHostId>
+    <ParticipantIds>
+      <int>123</int>
+      <int>1234</int>
+    </ParticipantIds>
+    <VendorIds />
+    <PollIds />
+    <ReceiptIds />
   </Event>
 </ArrayOfEvent>

@@ -47,12 +47,31 @@ namespace GatherUp.API.Controllers
             return Ok(new { eventId, financialBalance = status });
         }
 
-        [HttpPost("receipts")]
-        public ActionResult AddReceipt([FromBody] ReceiptDetails receipt)
+        [HttpPost("{eventId}/receipts")]
+        public ActionResult AddReceipt(int eventId, [FromBody] AddReceiptRequest req)
         {
-            if (receipt == null) return BadRequest(new { error = "נתוני קבלה לא תקינים." });
-            _financeService.AddReceipt(receipt);
-            return Ok(new { message = "הקבלה נוספה בהצלחה." });
+            if (req == null || string.IsNullOrWhiteSpace(req.ReceiptNumber) || req.Amount <= 0)
+                return BadRequest(new { error = "יש למלא מספר קבלה וסכום תקין." });
+            if (!IsUserManager(eventId)) return Forbid();
+
+            var receipt = new ReceiptDetails
+            {
+                ReceiptNumber = req.ReceiptNumber,
+                Amount = req.Amount,
+                Date = DateTime.Now
+            };
+
+            _financeService.AddReceipt(eventId, receipt);
+
+            string html = ReceiptHtmlGenerator.Generate(receipt);
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(html);
+            return File(bytes, "text/html", $"receipt_{receipt.ReceiptNumber}.html");
         }
+    }
+
+    public class AddReceiptRequest
+    {
+        public string ReceiptNumber { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
     }
 }

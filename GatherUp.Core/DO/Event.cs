@@ -35,5 +35,9 @@ namespace GatherUp.Core.DO
         [XmlArray("PollIds")]
         [XmlArrayItem("int")]
         public List<int> PollIds { get; set; } = new List<int>();
+
+        [XmlArray("ReceiptIds")]
+        [XmlArrayItem("int")]
+        public List<int> ReceiptIds { get; set; } = new List<int>();
     }
 }

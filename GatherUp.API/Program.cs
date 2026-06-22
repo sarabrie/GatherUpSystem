@@ -22,6 +22,8 @@ builder.Services.AddScoped<IRepository<VendorAllocation>, XmlRepository<VendorAl
 builder.Services.AddScoped<IRepository<ReceiptDetails>, ReceiptRepository>();
 builder.Services.AddScoped<IRepository<Poll>, XmlRepository<Poll>>();
 builder.Services.AddScoped<IRepository<Person>, XmlRepository<Person>>();
+builder.Services.AddScoped<IRepository<EventManager>, XmlRepository<EventManager>>();
+builder.Services.AddScoped<IRepository<EventHost>, XmlRepository<EventHost>>();
 
 
 // ==========================================

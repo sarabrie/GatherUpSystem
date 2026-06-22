@@ -39,8 +39,10 @@ namespace GatherUp.BL.Services
 
         public IEnumerable<ReceiptDetails> GetEventReceipts(int eventId)
         {
-            IEnumerable<int> receiptIds = GetEventSuppliers(eventId).SelectMany(v => v.ReceiptIds);
-            return _receiptRepo.GetAll().Where(r => receiptIds.Contains(r.Id));
+            Event ev = _eventRepo.GetById(eventId);
+            if (ev == null || ev.ReceiptIds == null || !ev.ReceiptIds.Any())
+                return Enumerable.Empty<ReceiptDetails>();
+            return _receiptRepo.GetAll().Where(r => ev.ReceiptIds.Contains(r.Id));
         }
 
         public decimal CalculateEventFinancialStatus(int eventId)
@@ -59,10 +61,16 @@ namespace GatherUp.BL.Services
                 .ToList();
         }
 
-        public void AddReceipt(ReceiptDetails receipt)
+        public void AddReceipt(int eventId, ReceiptDetails receipt)
         {
             if (receipt == null) return;
             _receiptRepo.Add(receipt);
+            Event ev = _eventRepo.GetById(eventId);
+            if (ev != null)
+            {
+                ev.ReceiptIds.Add(receipt.Id);
+                _eventRepo.Update(ev);
+            }
         }
         public void AddVendorToEvent(int eventId, VendorAllocation newVendor)
         {
