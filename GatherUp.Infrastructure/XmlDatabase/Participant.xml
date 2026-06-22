@@ -21,7 +21,7 @@
   <Participant Id="123">
     <Name>אילה</Name>
     <Email>ayala99263@gmail.com</Email>
-    <IsAttending>false</IsAttending>
+    <IsAttending>true</IsAttending>
     <HasPaid>false</HasPaid>
     <AmountContributed>0</AmountContributed>
     <MailingPreferences />

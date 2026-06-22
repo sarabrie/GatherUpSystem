@@ -82,6 +82,21 @@ namespace GatherUp.BL.Services
             }
         }
 
+        //עדכון הגעה של משתתף ש.ב
+        public void UpdateParticipantAttendance(int eventId, int participantId, bool isAttending)
+        {
+            Event ev = _eventRepo.GetById(eventId);
+            if (ev == null) throw new KeyNotFoundException($"אירוע {eventId} לא נמצא.");
+            if (ev.ParticipantIds == null || !ev.ParticipantIds.Contains(participantId))
+                throw new InvalidOperationException("המשתמש אינו משתתף באירוע זה.");
+
+            Participant participant = _participantRepo.GetById(participantId);
+            if (participant == null) throw new KeyNotFoundException($"משתתף {participantId} לא נמצא.");
+
+            participant.IsAttending = isAttending;
+            _participantRepo.Update(participant);
+        }
+
         public void SendReminderToParticipants(int eventId, string reminderType)
         {
             GetParticipantsForEvent(eventId)

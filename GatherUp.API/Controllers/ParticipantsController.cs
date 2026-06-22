@@ -32,6 +32,18 @@ namespace GatherUp.API.Controllers
             return Ok(new { message = "המשתתף נוסף בהצלחה לאירוע." });
         }
 
+        [HttpPatch("event/{eventId}/attendance")]
+
+        //לעדכון הגעה של משתתף ש.ב
+        public ActionResult UpdateAttendance(int eventId, [FromBody] AttendanceRequest request)
+        {
+            if (request == null) return BadRequest(new { error = "נתוני בקשה לא תקינים." });
+            int userId = GetCurrentUserId();
+            _eventManagerService.UpdateParticipantAttendance(eventId, userId, request.IsAttending);
+            string msg = request.IsAttending ? "הגעתך אושרה בהצלחה!" : "ביטול הגעתך נשלח בהצלחה.";
+            return Ok(new { message = msg });
+        }
+
         [HttpPost("event/{eventId}/remind")]
         public ActionResult SendReminder(int eventId, [FromQuery] string reminderType)
         {
@@ -40,5 +52,10 @@ namespace GatherUp.API.Controllers
             _eventManagerService.SendReminderToParticipants(eventId, reminderType);
             return Ok(new { message = "התזכורות נשלחו בהצלחה." });
         }
+    }
+
+    public class AttendanceRequest
+    {
+        public bool IsAttending { get; set; }
     }
 }

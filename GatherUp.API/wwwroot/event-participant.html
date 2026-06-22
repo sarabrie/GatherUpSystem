@@ -147,19 +147,19 @@
 
     async function doConfirmAttendance() {
         try {
-            await sendReminder(eventId, 'אישור הגעה');
+            await updateAttendance(eventId, true);
             document.getElementById('btn-attend').textContent = '✔ אישרתי הגעה';
             document.getElementById('btn-attend').style.background = '#27ae60';
-            showSuccess('ההגעה אושרה!');
+            showSuccess('הגעתך אושרה בהצלחה!');
         } catch(e) { showError(e.message); }
     }
 
     async function doCancelAttendance() {
         try {
-            await sendReminder(eventId, 'ביטול הגעה');
+            await updateAttendance(eventId, false);
             document.getElementById('btn-attend').textContent = 'אישור הגעה';
             document.getElementById('btn-attend').style.background = '';
-            showSuccess('ביטול ההגעה נשלח');
+            showSuccess('ביטול הגעתך נשלח בהצלחה.');
         } catch(e) { showError(e.message); }
     }
 
