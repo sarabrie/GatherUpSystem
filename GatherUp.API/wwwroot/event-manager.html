@@ -265,9 +265,11 @@
                 location: document.getElementById('f-location').value,
                 eventDate:document.getElementById('f-date').value
             });
-            showSuccess('האירוע עודכן בהצלחה!');
-            toggleEdit();
+            editing = false;
+            ['f-title','f-location','f-date','f-host'].forEach(id => document.getElementById(id).disabled = true);
+            document.getElementById('save-btn').style.display = 'none';
             await loadDetails();
+            showSuccess('האירוע עודכן בהצלחה!');
         } catch(e) { showError(e.message); }
     }
 

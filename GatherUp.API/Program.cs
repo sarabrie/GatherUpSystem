@@ -16,20 +16,20 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // ==========================================
 // Repositories
 // ==========================================
-builder.Services.AddScoped<IRepository<Event>, XmlRepository<Event>>();
-builder.Services.AddScoped<IRepository<Participant>, XmlRepository<Participant>>();
-builder.Services.AddScoped<IRepository<VendorAllocation>, XmlRepository<VendorAllocation>>();
-builder.Services.AddScoped<IRepository<ReceiptDetails>, ReceiptRepository>();
-builder.Services.AddScoped<IRepository<Poll>, XmlRepository<Poll>>();
-builder.Services.AddScoped<IRepository<Person>, XmlRepository<Person>>();
-builder.Services.AddScoped<IRepository<EventManager>, XmlRepository<EventManager>>();
-builder.Services.AddScoped<IRepository<EventHost>, XmlRepository<EventHost>>();
+builder.Services.AddSingleton<IRepository<Event>, XmlRepository<Event>>();
+builder.Services.AddSingleton<IRepository<Participant>, XmlRepository<Participant>>();
+builder.Services.AddSingleton<IRepository<VendorAllocation>, XmlRepository<VendorAllocation>>();
+builder.Services.AddSingleton<IRepository<ReceiptDetails>, ReceiptRepository>();
+builder.Services.AddSingleton<IRepository<Poll>, XmlRepository<Poll>>();
+builder.Services.AddSingleton<IRepository<Person>, XmlRepository<Person>>();
+builder.Services.AddSingleton<IRepository<EventManager>, XmlRepository<EventManager>>();
+builder.Services.AddSingleton<IRepository<EventHost>, XmlRepository<EventHost>>();
 
 
 // ==========================================
 // Mail Service & Notification Bridge
 // ==========================================
-builder.Services.AddScoped<IMailService>(provider =>
+builder.Services.AddSingleton<IMailService>(provider =>
 {
     IConfiguration config = provider.GetRequiredService<IConfiguration>();
     string host      = config["Smtp:Host"] ?? "smtp.gmail.com";
@@ -45,13 +45,12 @@ builder.Services.AddSingleton<IMailNotificationBridge, SimpleNotificationBridge>
 // ==========================================
 // BL Services
 // ==========================================
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<EventsService>();
-builder.Services.AddScoped<EventManagerService>();
-builder.Services.AddScoped<FinanceService>();
-builder.Services.AddScoped<PollService>();
-// 🌟 תוספת: רישום שירות ההתראות מה-BL שלכן
-builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton<AuthService>();
+builder.Services.AddSingleton<EventsService>();
+builder.Services.AddSingleton<EventManagerService>();
+builder.Services.AddSingleton<FinanceService>();
+builder.Services.AddSingleton<PollService>();
+builder.Services.AddSingleton<NotificationService>();
 
 // ==========================================
 // 🌟 תוספת: הגדרת פוליסי עבור CORS 🌟

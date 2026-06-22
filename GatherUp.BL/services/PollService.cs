@@ -61,6 +61,20 @@ namespace GatherUp.BL.Services
                     x => Math.Round((double)x.VoteCount / totalVotes * 100, 2) 
                 );
         }
+        public void SubmitAnswer(int pollId, string participantName, Dictionary<int, int> answers)
+        {
+            Poll poll = _pollRepo.GetAll().FirstOrDefault(p => p.Id == pollId);
+            if (poll == null) throw new KeyNotFoundException($"סקר {pollId} לא נמצא.");
+
+            foreach (var answer in answers)
+            {
+                var question = poll.Questions.FirstOrDefault(q => q.QuestionId == answer.Key);
+                if (question != null)
+                    question.ParticipantVotes[participantName] = answer.Value;
+            }
+            _pollRepo.Update(poll);
+        }
+
         public void CreatePoll(int eventId, Poll newPoll)
         {
             if (newPoll == null) return;

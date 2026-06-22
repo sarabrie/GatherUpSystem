@@ -12,4 +12,10 @@
     <HasReceipt>false</HasReceipt>
     <ReceiptIds />
   </VendorAllocation>
+  <VendorAllocation Id="3">
+    <Name>עדילחךףש</Name>
+    <AmountOwed>234</AmountOwed>
+    <HasReceipt>false</HasReceipt>
+    <ReceiptIds />
+  </VendorAllocation>
 </ArrayOfVendorAllocation>

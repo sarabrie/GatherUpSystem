@@ -31,6 +31,7 @@ namespace GatherUp.BL.Services
 
             notificationBridge.OnParticipantAction += HandleParticipantAction;
             notificationBridge.OnEventAction += HandleEventAction;
+            notificationBridge.OnNewPoll += HandleNewPoll;
         }
 
         public IEnumerable<Participant> GetParticipantsForEvent(int eventId)
@@ -97,6 +98,34 @@ namespace GatherUp.BL.Services
             _participantRepo.Update(participant);
         }
 
+        public void UpdateParticipantNotifications(int eventId, int participantId, int notificationSettings)
+        {
+            Event ev = _eventRepo.GetById(eventId);
+            if (ev == null) throw new KeyNotFoundException($"אירוע {eventId} לא נמצא.");
+            if (ev.ParticipantIds == null || !ev.ParticipantIds.Contains(participantId))
+                throw new InvalidOperationException("המשתמש אינו משתתף באירוע זה.");
+
+            Participant participant = _participantRepo.GetById(participantId);
+            if (participant == null) throw new KeyNotFoundException($"משתתף {participantId} לא נמצא.");
+
+            participant.NotificationSettings = (NotificationPreferences)notificationSettings;
+            _participantRepo.Update(participant);
+        }
+
+        public void UpdateParticipantPayment(int eventId, int participantId, bool hasPaid)
+        {
+            Event ev = _eventRepo.GetById(eventId);
+            if (ev == null) throw new KeyNotFoundException($"אירוע {eventId} לא נמצא.");
+            if (ev.ParticipantIds == null || !ev.ParticipantIds.Contains(participantId))
+                throw new InvalidOperationException("המשתמש אינו משתתף באירוע זה.");
+
+            Participant participant = _participantRepo.GetById(participantId);
+            if (participant == null) throw new KeyNotFoundException($"משתתף {participantId} לא נמצא.");
+
+            participant.HasPaid = hasPaid;
+            _participantRepo.Update(participant);
+        }
+
         public void SendReminderToParticipants(int eventId, string reminderType)
         {
             GetParticipantsForEvent(eventId)
@@ -105,10 +134,20 @@ namespace GatherUp.BL.Services
                 .ForEach(p => _mailService.Send(p.Email, $"Reminder: {reminderType}", "Please take action regarding the event."));
         }
 
+        private void HandleNewPoll(int eventId, string pollTitle)
+        {
+            _participantRepo.GetAll()
+                .Where(p => !string.IsNullOrEmpty(p.Email)
+                    && p.NotificationSettings.HasFlag(NotificationPreferences.NewPolls))
+                .ToList()
+                .ForEach(p => _mailService.Send(p.Email, $"סקר חדש: {pollTitle}", $"נפתח סקר חדש באירוע {eventId}: {pollTitle}"));
+        }
+
         private void HandleParticipantAction(int eventId, string actionType)
         {
             _participantRepo.GetAll()
-                .Where(p => !string.IsNullOrEmpty(p.Email) && p.MailingPreferences.Contains(MailingPreference.Email))
+                .Where(p => !string.IsNullOrEmpty(p.Email)
+                    && p.NotificationSettings.HasFlag(NotificationPreferences.AdminMessages))
                 .ToList()
                 .ForEach(p => _mailService.Send(p.Email, $"עדכון מנהל: {actionType}", $"בוצעה פעולה באירוע {eventId}: {actionType}"));
         }
@@ -116,7 +155,8 @@ namespace GatherUp.BL.Services
         private void HandleEventAction(int eventId, string actionType)
         {
             _participantRepo.GetAll()
-                .Where(p => !string.IsNullOrEmpty(p.Email) && p.MailingPreferences.Contains(MailingPreference.Email))
+                .Where(p => !string.IsNullOrEmpty(p.Email)
+                    && p.NotificationSettings.HasFlag(NotificationPreferences.EventChanges))
                 .ToList()
                 .ForEach(p => _mailService.Send(p.Email, $"עדכון אירוע: {actionType}", $"חל שינוי באירוע {eventId}: {actionType}"));
         }

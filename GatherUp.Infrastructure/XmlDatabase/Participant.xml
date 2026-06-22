@@ -21,8 +21,8 @@
   <Participant Id="123">
     <Name>אילה</Name>
     <Email>ayala99263@gmail.com</Email>
-    <IsAttending>true</IsAttending>
-    <HasPaid>false</HasPaid>
+    <IsAttending>false</IsAttending>
+    <HasPaid>true</HasPaid>
     <AmountContributed>0</AmountContributed>
     <MailingPreferences />
     <NotificationSettings>EventChanges AdminMessages NewPolls</NotificationSettings>
@@ -39,8 +39,8 @@
   <Participant Id="1234">
     <Name>שרה ברייש</Name>
     <Email>sarabr0278@gmail.com</Email>
-    <IsAttending>false</IsAttending>
-    <HasPaid>false</HasPaid>
+    <IsAttending>true</IsAttending>
+    <HasPaid>true</HasPaid>
     <AmountContributed>0</AmountContributed>
     <MailingPreferences />
     <NotificationSettings>EventChanges AdminMessages NewPolls</NotificationSettings>

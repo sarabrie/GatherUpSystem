@@ -21,7 +21,9 @@
       <Options>רחוב</Options>
       <Options>שכונה</Options>
       <Options>סמינר</Options>
-      <ParticipantVotes />
+      <ParticipantVotes>
+        <Vote ParticipantName="אילה" ChosenOptionIndex="1" />
+      </ParticipantVotes>
     </Questions>
   </Poll>
   <Poll Id="3">
@@ -33,6 +35,30 @@
       <Options>מחר</Options>
       <Options>מחרותיים</Options>
       <Options>שבוע הבא</Options>
+      <ParticipantVotes />
+    </Questions>
+  </Poll>
+  <Poll Id="4">
+    <Title>אגדז3קאש</Title>
+    <Description>גכדאקש5</Description>
+    <Questions QuestionId="1">
+      <QuestionText>מלצת.ץ</QuestionText>
+      <Options>לך</Options>
+      <Options>חךלף</Options>
+      <Options>מצת</Options>
+      <Options>ךלף</Options>
+      <ParticipantVotes />
+    </Questions>
+  </Poll>
+  <Poll Id="5">
+    <Title>אגדז3קאש</Title>
+    <Description>גכדאקש5</Description>
+    <Questions QuestionId="1">
+      <QuestionText>מלצת.ץ</QuestionText>
+      <Options>לך</Options>
+      <Options>חךלף</Options>
+      <Options>מצת</Options>
+      <Options>ךלף</Options>
       <ParticipantVotes />
     </Questions>
   </Poll>

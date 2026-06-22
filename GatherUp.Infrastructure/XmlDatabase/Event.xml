@@ -20,7 +20,7 @@
     <ReceiptIds />
   </Event>
   <Event Id="2">
-    <Title>jdhd, xhuo</Title>
+    <Title>jdhd, xhuog</Title>
     <EventDate>2026-06-26T00:00:00</EventDate>
     <Location />
     <EventManagerId>987654321</EventManagerId>
@@ -29,7 +29,9 @@
       <int>2</int>
       <int>123</int>
     </ParticipantIds>
-    <VendorIds />
+    <VendorIds>
+      <int>3</int>
+    </VendorIds>
     <PollIds>
       <int>2</int>
     </PollIds>
@@ -37,7 +39,7 @@
   </Event>
   <Event Id="3">
     <Title>חתונה לציפי!!!!!!!!!!</Title>
-    <EventDate>2026-08-13T00:00:00</EventDate>
+    <EventDate>2026-08-09T00:00:00</EventDate>
     <Location />
     <EventManagerId>123456789</EventManagerId>
     <EventHostId>987654321</EventHostId>
@@ -46,7 +48,10 @@
       <int>1234</int>
     </ParticipantIds>
     <VendorIds />
-    <PollIds />
+    <PollIds>
+      <int>4</int>
+      <int>5</int>
+    </PollIds>
     <ReceiptIds />
   </Event>
 </ArrayOfEvent>

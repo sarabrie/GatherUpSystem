@@ -63,13 +63,9 @@
         <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap">
             <button id="btn-attend" class="btn btn-primary" onclick="doConfirmAttendance()">אישור הגעה</button>
             <button class="btn btn-outline" onclick="doCancelAttendance()">ביטול הגעה</button>
+            <button id="btn-paid" class="btn btn-primary" onclick="doConfirmPayment()">✔ שילמתי</button>
         </div>
-        <div class="payment-box" id="payment-info">
-            <div><div class="lbl">סטטוס</div><div>—</div></div>
-            <div><div class="lbl">חוב</div><div class="val">—</div></div>
-            <div><div class="lbl">שולם</div><div class="val">—</div></div>
-            <div><div class="lbl">תאריך</div><div class="val">—</div></div>
-        </div>
+
     </div>
 
     <!-- סקרים -->
@@ -82,11 +78,11 @@
     <div class="card">
         <div class="card-title">הגדרות התראות</div>
         <div class="check-group">
-            <label><input type="checkbox" checked> שינוי בפרטי האירוע</label>
-            <label><input type="checkbox" checked> פתיחת סקר חדש</label>
-            <label><input type="checkbox"> הודעה ממנהל האירוע</label>
+            <label><input type="checkbox" id="notif-event-changes"> שינוי בפרטי האירוע</label>
+            <label><input type="checkbox" id="notif-admin-messages"> הודעה ממנהל האירוע</label>
+            <label><input type="checkbox" id="notif-new-polls"> פתיחת סקר חדש</label>
         </div>
-        <button class="btn btn-primary" style="margin-top:16px;font-size:13px;padding:8px 16px">💾 שמור הגדרות</button>
+        <button class="btn btn-primary" style="margin-top:16px;font-size:13px;padding:8px 16px" onclick="doSaveNotifications()">💾 שמור הגדרות</button>
     </div>
 </div>
 
@@ -96,7 +92,7 @@
         <div class="modal-title" id="poll-modal-title">ענה על סקר</div>
         <div id="poll-questions-container"></div>
         <div class="modal-actions">
-            <button class="btn btn-primary" onclick="closeModalById('modal-poll-answer')">שלח</button>
+            <button class="btn btn-primary" onclick="doSubmitPoll()">שלח</button>
             <button class="btn btn-outline" onclick="closeModalById('modal-poll-answer')" style="color:#666;border-color:#ddd">ביטול</button>
         </div>
     </div>
@@ -109,6 +105,24 @@
     if (!eventId) location.href = 'home.html';
 
     async function loadPage() {
+        try {
+            const me = await getMyParticipation(eventId);
+            if (me.isAttending) {
+                document.getElementById('btn-attend').textContent = '✔ אישרתי הגעה';
+                document.getElementById('btn-attend').style.background = '#27ae60';
+            }
+            if (me.hasPaid) {
+                const btn = document.getElementById('btn-paid');
+                btn.textContent = '✔ שולם';
+                btn.style.background = '#27ae60';
+                btn.disabled = true;
+            }
+            const s = me.notificationSettings || 0;
+            document.getElementById('notif-event-changes').checked  = !!(s & 1);
+            document.getElementById('notif-admin-messages').checked = !!(s & 2);
+            document.getElementById('notif-new-polls').checked      = !!(s & 4);
+        } catch(e) {}
+
         try {
             const ev = await getEventDetails(eventId);
             document.getElementById('event-title').textContent = ev.title;
@@ -126,15 +140,21 @@
             c.innerHTML = polls.map(p => `
                 <div class="poll-block">
                     <div class="poll-name">📊 ${p.title}</div>
-                    <button class="btn btn-primary btn-sm" onclick="openPollModal(${p.id}, '${p.title}', ${JSON.stringify(p.questions || []).replace(/'/g,"&#39;")})">ענה על סקר</button>
+                    <button class="btn btn-primary btn-sm" onclick="openPollModal(${p.id})">ענה על סקר</button>
                 </div>`).join('');
+            polls.forEach(p => pollsData[p.id] = p);
         } catch(e) { showError(e.message); }
     }
 
-    function openPollModal(pollId, title, questions) {
-        document.getElementById('poll-modal-title').textContent = '📊 ' + title;
+    let currentPollId = null;
+    let pollsData = {};
+
+    function openPollModal(pollId) {
+        currentPollId = pollId;
+        const poll = pollsData[pollId];
+        document.getElementById('poll-modal-title').textContent = '📊 ' + poll.title;
         const c = document.getElementById('poll-questions-container');
-        c.innerHTML = questions.map((q, qi) => `
+        c.innerHTML = poll.questions.map((q, qi) => `
             <div class="question-block">
                 <p>שאלה ${qi+1}: ${q.questionText}</p>
                 ${(q.options || []).map((opt, oi) => `
@@ -145,12 +165,47 @@
         openModal('modal-poll-answer');
     }
 
+    async function doSaveNotifications() {
+        try {
+            let value = 0;
+            if (document.getElementById('notif-event-changes').checked)  value |= 1;
+            if (document.getElementById('notif-admin-messages').checked) value |= 2;
+            if (document.getElementById('notif-new-polls').checked)      value |= 4;
+            await updateNotifications(eventId, value);
+            showSuccess('הגדרות ההתראות נשמרו!');
+        } catch(e) { showError(e.message); }
+    }
+
+    async function doSubmitPoll() {
+        try {
+            const answers = {};
+            document.querySelectorAll('#poll-questions-container .question-block').forEach(block => {
+                const checked = block.querySelector('input[type=radio]:checked');
+                if (checked) answers[parseInt(checked.name.replace('q_', ''))] = parseInt(checked.value);
+            });
+            await submitPollAnswer(currentPollId, answers);
+            closeModalById('modal-poll-answer');
+            showSuccess('תשובותך נשמרו בהצלחה!');
+        } catch(e) { showError(e.message); }
+    }
+
     async function doConfirmAttendance() {
         try {
             await updateAttendance(eventId, true);
             document.getElementById('btn-attend').textContent = '✔ אישרתי הגעה';
             document.getElementById('btn-attend').style.background = '#27ae60';
             showSuccess('הגעתך אושרה בהצלחה!');
+        } catch(e) { showError(e.message); }
+    }
+
+    async function doConfirmPayment() {
+        try {
+            await updatePayment(eventId);
+            const btn = document.getElementById('btn-paid');
+            btn.textContent = '✔ שולם';
+            btn.style.background = '#27ae60';
+            btn.disabled = true;
+            showSuccess('התשלום אושר בהצלחה!');
         } catch(e) { showError(e.message); }
     }
 
