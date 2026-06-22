@@ -1,17 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ArrayOfParticipant xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Participant Id="1">
-    <Name>אילה לוי</Name>
-    <Email>ayala99263@gmail.com</Email>
-    <IsAttending>false</IsAttending>
-    <HasPaid>false</HasPaid>
-    <AmountContributed>0</AmountContributed>
-    <MailingPreferences />
-    <NotificationSettings>EventChanges AdminMessages NewPolls</NotificationSettings>
-  </Participant>
-  <Participant Id="2">
-    <Name>tct</Name>
-    <Email>ayala99263asd@gmail.com</Email>
+    <Name>שרה ברייש</Name>
+    <Email>sarabr0278@gmail.com</Email>
     <IsAttending>false</IsAttending>
     <HasPaid>false</HasPaid>
     <AmountContributed>0</AmountContributed>

@@ -163,8 +163,9 @@
 <div id="modal-add-participant" class="modal" onclick="closeModal(event,this)">
     <div class="modal-box">
         <div class="modal-title">+ הוספת משתתף</div>
-        <div class="field"><label>שם מלא</label><input id="p-name" type="text" placeholder="שם"></div>
-        <div class="field"><label>מייל</label><input id="p-email" type="email" placeholder="מייל"></div>
+        <div class="field"><label>בחר משתתף רשום</label>
+            <select id="p-select"><option value="">-- בחר משתתף --</option></select>
+        </div>
         <div class="modal-actions">
             <button class="btn btn-primary" onclick="doAddParticipant()">הוסף</button>
             <button class="btn btn-outline" onclick="closeModalById('modal-add-participant')">ביטול</button>
@@ -284,13 +285,15 @@
     }
 
     async function doAddParticipant() {
-        const name  = document.getElementById('p-name').value.trim();
-        const email = document.getElementById('p-email').value.trim();
-        if (!name || !email) { showError('יש למלא שם ומייל'); return; }
+        const sel   = document.getElementById('p-select');
+        const email = sel.value;
+        const name  = sel.options[sel.selectedIndex]?.text?.split(' (')[0] || '';
+        if (!email) { showError('יש לבחור משתתף'); return; }
         try {
             await addParticipant(eventId, { name, email, isAttending: false, hasPaid: false, amountContributed: 0, mailingPreferences: [] });
             showSuccess('המשתתף נוסף!');
             closeModalById('modal-add-participant');
+            sel.value = '';
             await loadParticipants();
         } catch(e) { showError(e.message); }
     }
@@ -421,6 +424,20 @@
     function closeModal(e, el)  { if (e.target === el) el.classList.remove('open'); }
 
     loadDetails();
+
+    async function loadPersonsIntoSelect() {
+        try {
+            const persons = await getAllPersons();
+            const sel = document.getElementById('p-select');
+            persons.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.email;
+                opt.textContent = `${p.name} (${p.email})`;
+                sel.appendChild(opt);
+            });
+        } catch(e) { /* silent */ }
+    }
+    loadPersonsIntoSelect();
 </script>
 </body>
 </html>

@@ -14,16 +14,19 @@ namespace GatherUp.BL.Services
     {
         private readonly IRepository<Event> _eventRepo;
         private readonly IRepository<Participant> _participantRepo;
+        private readonly IRepository<Person> _personRepo;
         private readonly IMailService _mailService;
 
         public EventManagerService(
             IRepository<Event> eventRepo,
             IRepository<Participant> participantRepo,
+            IRepository<Person> personRepo,
             IMailNotificationBridge notificationBridge, 
             IMailService mailService)
         {
             _eventRepo = eventRepo;
             _participantRepo = participantRepo;
+            _personRepo = personRepo;
             _mailService = mailService;
 
             notificationBridge.OnParticipantAction += HandleParticipantAction;
@@ -43,17 +46,25 @@ namespace GatherUp.BL.Services
         {
             if (participant == null) return;
 
-            _participantRepo.Add(participant);
+            Person registeredUser = _personRepo.GetAll().FirstOrDefault(p => p.Email == participant.Email);
+            if (registeredUser == null)
+                throw new InvalidOperationException($"משתמש עם מייל {participant.Email} אינו רשום במערכת.");
 
             Event ev = _eventRepo.GetById(eventId);
-            if (ev != null)
-            {
-                if (ev.ParticipantIds == null)
-                    ev.ParticipantIds = new List<int>();
+            if (ev == null) throw new KeyNotFoundException($"אירוע {eventId} לא נמצא.");
 
-                ev.ParticipantIds.Add(participant.Id);
-                _eventRepo.Update(ev);
-            }
+            if (ev.ParticipantIds != null && ev.ParticipantIds.Contains(registeredUser.Id))
+                throw new InvalidOperationException("המשתמש כבר משתתף באירוע זה.");
+
+            participant.Id = registeredUser.Id;
+            participant.Name = registeredUser.Name;
+
+            if (!_participantRepo.GetAll().Any(p => p.Id == participant.Id))
+                _participantRepo.Add(participant);
+
+            if (ev.ParticipantIds == null) ev.ParticipantIds = new List<int>();
+            ev.ParticipantIds.Add(participant.Id);
+            _eventRepo.Update(ev);
         }
 
         public void UpdateEventDetails(int eventId, Event updatedEvent)

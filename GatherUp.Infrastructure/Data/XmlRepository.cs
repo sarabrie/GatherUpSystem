@@ -41,18 +41,19 @@ namespace GatherUp.Infrastructure.Data
             return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
-        public virtual void Add(T entity)
+        public virtual int Add(T entity)
         {
             List<T> currentData = GetAll().ToList();
 
             if (entity.Id == 0)
             {
                 int nextId = currentData.Count > 0 ? currentData.Max(x => x.Id) + 1 : 1;
-                ((dynamic)entity).Id = nextId;
+                entity.GetType().GetProperty("Id")!.SetValue(entity, nextId);
             }
 
             currentData.Add(entity);
             XMLSerializer.WriteToFile(_filePath, currentData);
+            return entity.Id;
         }
 
         public virtual void Update(T entity)

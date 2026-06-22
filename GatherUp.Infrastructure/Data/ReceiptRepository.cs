@@ -24,9 +24,9 @@ namespace GatherUp.Infrastructure.Data
             XMLDocManager.CreateEmptyXmlFile(_filePath, "Receipts");
         }
 
-        public override void Add(ReceiptDetails entity)
+        public override int Add(ReceiptDetails entity)
         {
-            if (entity == null) return;
+            if (entity == null) return 0;
 
             string originalPath = entity.ReceiptFilePath;
             string fileName = Path.GetFileName(originalPath);
@@ -48,6 +48,7 @@ namespace GatherUp.Infrastructure.Data
             );
 
             XMLDocManager.AddElementToRoot(_filePath, newReceiptElement);
+            return entity.Id;
         }
 
         public override ReceiptDetails GetById(int id)

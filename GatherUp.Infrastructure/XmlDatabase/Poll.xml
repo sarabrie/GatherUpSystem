@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ArrayOfPoll xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Poll Id="1">
-    <Title>תאריך</Title>
+    <Title>סקר מיקום</Title>
     <Description />
     <Questions QuestionId="1">
-      <QuestionText>מתי תרצו שתתקיים המסיבה?</QuestionText>
-      <Options>היום</Options>
-      <Options>מחר</Options>
-      <Options>מחרותיים</Options>
-      <Options>שבוע הבא</Options>
+      <QuestionText>איזה מיקום מועדף?</QuestionText>
+      <Options>בית</Options>
+      <Options>רחוב</Options>
+      <Options>שכונה</Options>
+      <Options>סמינר</Options>
       <ParticipantVotes />
     </Questions>
   </Poll>
