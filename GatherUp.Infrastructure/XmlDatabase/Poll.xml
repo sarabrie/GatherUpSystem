@@ -79,7 +79,9 @@
       <Options>מחר</Options>
       <Options>מחרותיים</Options>
       <Options>שבוע הבא</Options>
-      <ParticipantVotes />
+      <ParticipantVotes>
+        <Vote ParticipantName="שרה ברייש" ChosenOptionIndex="2" />
+      </ParticipantVotes>
     </Questions>
   </Poll>
   <Poll Id="7">
@@ -115,6 +117,18 @@
       <Options>מחר</Options>
       <Options>מחרותיים</Options>
       <Options>שבוע הבא</Options>
+      <ParticipantVotes />
+    </Questions>
+  </Poll>
+  <Poll Id="10">
+    <Title>אגדז3קאשrtyuk</Title>
+    <Description />
+    <Questions QuestionId="1">
+      <QuestionText>מלצת.ץfgh</QuestionText>
+      <Options>לך</Options>
+      <Options>חךלף</Options>
+      <Options>מצת</Options>
+      <Options>ךלף</Options>
       <ParticipantVotes />
     </Questions>
   </Poll>

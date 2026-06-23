@@ -12,13 +12,11 @@ namespace GatherUp.API.Controllers
     {
         protected readonly EventsService _eventsService;
 
-        // הבנאי של מחלקת הבסיס
         protected BaseApiController(EventsService eventsService)
         {
             _eventsService = eventsService;
         }
 
-        // 🌟 1. חילוץ מהיר של ה-ID מהטוקן
         protected int GetCurrentUserId()
         {
             string? userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -26,7 +24,6 @@ namespace GatherUp.API.Controllers
             return userId;
         }
 
-        // 🌟 2. בדיקה האם המשתמש המחובר הוא מנהל או מארח
         protected bool IsUserManager(int eventId)
         {
             int currentUserId = GetCurrentUserId();
@@ -36,7 +33,6 @@ namespace GatherUp.API.Controllers
             return ev.EventManagerId == currentUserId;
         }
 
-        // 🌟 3. בדיקה האם המשתמש קשור לאירוע (מנהל, מארח או משתתף רשום)
         protected bool IsUserInEvent(int eventId)
         {
             int currentUserId = GetCurrentUserId();

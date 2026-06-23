@@ -53,7 +53,6 @@ namespace GatherUp.API.Controllers
 
         [HttpPatch("event/{eventId}/attendance")]
 
-        //לעדכון הגעה של משתתף ש.ב
         public ActionResult UpdateAttendance(int eventId, [FromBody] AttendanceRequest request)
         {
             if (request == null) return BadRequest(new { error = "נתוני בקשה לא תקינים." });

@@ -83,7 +83,6 @@ namespace GatherUp.BL.Services
             }
         }
 
-        //עדכון הגעה של משתתף ש.ב
         public void UpdateParticipantAttendance(int eventId, int participantId, bool isAttending)
         {
             Event ev = _eventRepo.GetById(eventId);
